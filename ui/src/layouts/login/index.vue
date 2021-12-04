@@ -31,7 +31,7 @@ import FooterComponent from './../../components/footer/copy-right.vue'
         />
       </van-cell-group>
       <div class="w-full">
-        <van-button type="primary" @click="this.$router.push('/receive') " class="w-1/2 mx-auto mt-8" size="small" :loading="btnLoginLoading" loading-text="Loading..." block>Sign in</van-button>
+        <van-button type="primary" @click="this.$router.push('/receive') " class="w-1/2 mx-auto mt-8" size="small" block>Sign in</van-button>
       </div>
       <div class="mt-16">
         <FooterComponent />
@@ -42,14 +42,12 @@ import FooterComponent from './../../components/footer/copy-right.vue'
 <script>
 export default {
   setup(){
-    const btnLoginLoading = ref(false)
-    const email = ref("")
-    const password= ref("")
     return {
-      btnLoginLoading ,
-      email ,
-      password ,
+      
     }
+  },
+  data(){
+    btnLoginLoading: false
   },
   name: 'LoginTemplate'
 }
