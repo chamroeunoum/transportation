@@ -31,7 +31,7 @@ import FooterComponent from './../../components/footer/copy-right.vue'
         />
       </van-cell-group>
       <div class="w-full">
-        <van-button type="primary" @click="this.$router.push('/receive') " class="w-1/2 mx-auto mt-8" size="small" block>Sign in</van-button>
+        <router-link to="/receive">Sign in</router-link>
       </div>
       <div class="mt-16">
         <FooterComponent />
