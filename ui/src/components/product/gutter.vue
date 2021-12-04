@@ -31,16 +31,16 @@
       <div class="w-full font-extrabold my-4" >Dimension : {{ record.dimension }}</div>
       <div class="w-full font-extrabold my-4" >Price : {{ record.price }} THB</div>
       <div class="w-full font-extrabold mt-4 mb-8" >Note : {{ record.note }}</div>
-      <div @click="toggleCreatePopup(true)" class="mx-2 w-4 h-4 mt-1 text-center text-red-500 cursor-pointer absolute top-4 right-1" >
+      <div class="mx-2 w-4 h-4 mt-1 text-center text-red-500 cursor-pointer absolute top-4 right-1" >
         <van-icon name="close" :size="20" class="" />
       </div>
-      <div @click="toggleCreatePopup(true)" class="mx-2 w-4 h-4 mt-1 text-center text-blue-500 cursor-pointer absolute top-4 right-7" >
+      <div class="mx-2 w-4 h-4 mt-1 text-center text-blue-500 cursor-pointer absolute top-4 right-7" >
         <van-icon name="edit" :size="20" class="" />
       </div>
-      <div @click="toggleCreatePopup(true)" class="mx-2 w-4 h-4 mt-1 text-center text-blue-500 absolute left-2 top-4 " >
+      <div class="mx-2 w-4 h-4 mt-1 text-center text-blue-500 absolute left-2 top-4 " >
         <van-icon name="logistics" :size="20" class="" />
       </div>
-      <div @click="toggleCreatePopup(true)" class="mx-2 w-4 h-4 mt-1 text-center text-green-500 absolute left-8 top-4 " >
+      <div class="mx-2 w-4 h-4 mt-1 text-center text-green-500 absolute left-8 top-4 " >
         <van-icon name="passed" :size="20" class="" />
       </div>
       <qrcode-vue :value="record.code" :size="140" level="H" class="mx-auto" />
