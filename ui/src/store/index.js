@@ -5,7 +5,7 @@ const debug = process.env.NODE_ENV !== 'production'
 
 export default createStore({
   state: {
-    apiServer: 'http://192.168.1.42:8000/api'
+    apiServer: 'http://sctservice.kabit.asia/api'
   },
   modules: {
     product

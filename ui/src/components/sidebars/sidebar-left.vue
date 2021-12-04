@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bottom-0 left-0 border-r top-16 w-60 bg-gray-100" >
+  <div v-if="false" class="fixed bottom-0 left-0 border-r top-16 w-60 bg-gray-100" >
     <!-- Menu -->
     <div v-if="sidebarToggle" class="absolute w-full sidebar">
       <!-- Menu Item -->
