@@ -1,0 +1,26 @@
+<template>
+  <div class="fixed bg-gray-100 top-0 left-0 right-0 flex h-16 p-2 mb-4 border-b border-gray-300" >
+    <div class="flex-none w-12 h-12">
+      <router-link to="/dashboard">
+        <img src="./../../assets/logo.png" class="w-full rounded-full" alt="SCT Logo" title="SCT Logo" />
+      </router-link>
+    </div>
+    <div class="flex-grow h-12 ">
+      <!-- This item will grow -->
+    </div>
+    <div class="flex-none w-12 h-12 ...">
+      <div class="w-12 h-12 rounded-full" >
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script >
+export default {
+  name: 'Topmenu'  ,
+
+}
+</script>
