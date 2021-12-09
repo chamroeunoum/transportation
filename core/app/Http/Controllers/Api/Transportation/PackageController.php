@@ -13,7 +13,7 @@ class PackageController extends Controller
      * Listing packages
      */
     public function index(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         return response()->json([
             'records' => $crud->pagination(true,$crud->getListBuilder() ) ,
             'message' => 'Listing ready.'
@@ -23,7 +23,7 @@ class PackageController extends Controller
      * Read package
      */
     public function read(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         if( ($record = $crud->read() ) ){
             return response()->json([
                 'record' => $record ,
@@ -40,12 +40,12 @@ class PackageController extends Controller
      */
     public function create(Request $request){
         $request->merge(['code'=> "SCTN".\Carbon\Carbon::now()->format('YmdHis') ]);
-        $crud = new CrudController( new RecordModel, $request , [ 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         if( ( $record = $crud->create() ) ){
             $record->code = "SCTN".\Carbon\Carbon::now()->format('YmdHis'); 
             $record->save();
             return response()->json([
-                'record' => $crud->formatRecord( $record ) ,
+                'record' => $record ,
                 'message' => 'បញ្ញើរបានរក្សារទុក.'
             ],200);
         }
@@ -58,10 +58,10 @@ class PackageController extends Controller
      * Update package
      */
     public function update(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         if( ( $record = $crud->update() ) ){
             return response()->json([
-                'record' => $crud->formatRecord( $record ) ,
+                'record' => $record,
                 'message' => 'បញ្ញើរបានរក្សារទុក.'
             ],200);
         }
@@ -74,7 +74,7 @@ class PackageController extends Controller
      * Delete package
      */
     public function delete(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'note','weight','dimension','sender_id','receiver_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         if( ($record = $crud->read() ) ){
             if( $crud->delete() ){
                 return response()->json([

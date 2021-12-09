@@ -37,23 +37,40 @@ class AuthController extends Controller
         $credentials['deleted_at'] = null;
 
         if (!Auth::attempt($credentials)) {
+            // if (!auth()->attempt($data)) {
+            //     return response(['error_message' => 'Incorrect Details. 
+            //     Please try again']);
+            // }
             $user = User::where('email', $request->email)->limit(1)->first() ;
             if ( $user != null ){ 
-                if( $user->email_verified_at == "" ) {
-                    /**
-                     * Account does exist but the password might miss type
-                     */
+                /**
+                 * Account is disabled
+                 */
+                if( $user->active != 1 ){
                     return response()->json([
-                        'message' => 'អ្នកមិនទាន់បានបញ្ជាក់ អំពីការចុះឈ្មោះនៅឡើយ។ សូមបញ្ចាក់ការចុះឈ្មោះរបស់អ្នកជាមុនសិន !'
-                    ], 401);
-                }else{
-                    /**
-                     * Account does exist but the password might miss type
-                     */
-                    return response()->json([
-                        'message' => 'សូមពិនិត្យពាក្យសម្ងាត់របស់អ្នក !'
-                    ], 401);
+                        'message' => 'គណនីត្រូវបានបិទ។'
+                    ], 201);
                 }
+                /**
+                 * Account does exist but the password might miss type
+                 */
+                if( $user->email_verified_at == "" ) {
+                    
+                    return response()->json([
+                        'message' => 'អ្នកមិនទាន់បានបញ្ជាក់ អំពីការចុះឈ្មោះនៅឡើយ។ សូមបញ្ចាក់ការចុះឈ្មោះរបស់អ្នកជាមុនសិន។'
+                    ], 201);
+                }
+                if( $user->deleted_at != null ) {
+                    
+                    return response()->json([
+                        'message' => 'គណនីនេះត្រូវបានដកចេញពីប្រព័ន្ធ។'
+                    ], 201);
+                }
+
+                return response()->json([
+                    'message' => 'ពាក្យសម្ងាត់របស់អ្នកមិនត្រឹមត្រូវហើយ។'
+                ], 201);
+                
             } else {
                 /**
                  * Account does exist but the password might miss type
@@ -64,19 +81,27 @@ class AuthController extends Controller
             }
         }
 
-        $user = $request->user();
+        /**
+         * Get authenticated user
+         */
+        $user = $request->user(); 
 
-        // $tokenResult = $user->createToken('Personal Access Token');
+        /**
+         * Create token for authenticated user
+         */
         $tokenResult = $user->createToken('Personal Access Token');
         $token = $tokenResult->token;
         if ($request->remember_me)
             $token->expires_at = Carbon::now()->addDay();
         $token->save();
 
+        /**
+         * Re-fetching the user 
+         */
         $user = Auth::user();
         if ($user) {
-            if (Storage::disk(env('FILESYSTEM_DRIVER','public'))->exists($user->avatar_url)) {
-                $user->avatar_url = Storage::disk(env('FILESYSTEM_DRIVER','public'))->url($user->avatar_url);
+            if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($user->avatar_url)) {
+                $user->avatar_url = Storage::disk(env('STORAGE_DRIVER','public'))->url($user->avatar_url);
             }
             else{
                 $user->avatar_url = null ;

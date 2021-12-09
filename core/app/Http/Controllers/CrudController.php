@@ -303,8 +303,8 @@ class CrudController extends Controller {
         if (isset($record->photos) && is_array($record->photos) ){
             $photos = [];
             foreach ($record->photos as $index => $photo) {
-                if ($photo != null && Storage::disk(env('FILESYSTEM_DRIVER','public'))->exists($photo)) {
-                    $photos[] = Storage::disk(env('FILESYSTEM_DRIVER','public'))->url($photo);
+                if ($photo != null && Storage::disk(env('STORAGE_DRIVER','public'))->exists($photo)) {
+                    $photos[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($photo);
                 }
             }
             $record->photos = $photos;
@@ -315,13 +315,13 @@ class CrudController extends Controller {
         $pdfs = [];
         if (isset($record->pdfs) && is_array($record->pdfs)) {
             foreach ($record->pdfs as $index => $pdf) {
-                if ($pdf != null && Storage::disk(env('FILESYSTEM_DRIVER','public'))->exists($pdf)) {
-                    $pdfs[] = Storage::disk(env('FILESYSTEM_DRIVER','public'))->url($pdf);
+                if ($pdf != null && Storage::disk(env('STORAGE_DRIVER','public'))->exists($pdf)) {
+                    $pdfs[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($pdf);
                 }
             }
         } else if( isset($record->pdfs) && !is_array($record->pdfs) ) {
-            if (Storage::disk(env('FILESYSTEM_DRIVER','public'))->exists($record->pdfs)) {
-                $pdfs[] = Storage::disk(env('FILESYSTEM_DRIVER','public'))->url($record->pdfs);
+            if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($record->pdfs)) {
+                $pdfs[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($record->pdfs);
             }else{
                 $pdfs=[];
             }
@@ -329,8 +329,8 @@ class CrudController extends Controller {
         $record->pdfs = $pdfs;
         /** In case, record has field avatar_url */
         if (isset($record->avatar_url ) && $record->avatar_url !== "" ) {
-            if (Storage::disk(env('FILESYSTEM_DRIVER','public'))->exists($record->avatar_url)) {
-                $record->avatar_url = Storage::disk(env('FILESYSTEM_DRIVER','public'))->url($record->avatar_url);
+            if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($record->avatar_url)) {
+                $record->avatar_url = Storage::disk(env('STORAGE_DRIVER','public'))->url($record->avatar_url);
             } else {
                 $record->avatar_url = null;
             }
@@ -471,9 +471,9 @@ class CrudController extends Controller {
         if (($record = $this->model->find($this->request->id))!==null) {
             $uniqeName = '' ;
             if($fileName !== false ){
-                $uniqeName = Storage::disk(env('FILESYSTEM_DRIVER','public'))->putFileAs($path, new File($file), $fileName , 'public');
+                $uniqeName = Storage::disk(env('STORAGE_DRIVER','public'))->putFileAs($path, new File($file), $fileName , 'public');
             }else{
-                $uniqeName = Storage::disk(env('FILESYSTEM_DRIVER','public'))->putFile($path, new File($file), 'public');
+                $uniqeName = Storage::disk(env('STORAGE_DRIVER','public'))->putFile($path, new File($file), 'public');
             }
 
             $files = is_array( $record->$field_name ) ? $record->$field_name : [ $record->$field_name ];
@@ -483,8 +483,8 @@ class CrudController extends Controller {
             if (is_array($record->$field_name) && count($record->$field_name)) {
                 $files = [];
                 foreach ($record->$field_name as $index => $file) {
-                    if (Storage::disk(env('FILESYSTEM_DRIVER','public'))->exists($file)) {
-                        $files[] = Storage::disk(env('FILESYSTEM_DRIVER','public'))->url($file);
+                    if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($file)) {
+                        $files[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($file);
                     }
                 }
                 $record->$field_name = $files;
@@ -503,12 +503,12 @@ class CrudController extends Controller {
                 foreach ($record->$field as $index => $file ) {
                     if ($this->request->index != $index){
                         $files[] = $file ;
-                        if (Storage::disk(env('FILESYSTEM_DRIVER','public'))->exists($file)) {
-                            $urls[] = Storage::disk(env('FILESYSTEM_DRIVER','public'))->url($file);
+                        if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($file)) {
+                            $urls[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($file);
                         }
                     }
                     else{
-                        Storage::disk(env('FILESYSTEM_DRIVER','public'))->delete($file);
+                        Storage::disk(env('STORAGE_DRIVER','public'))->delete($file);
                     }
                 }
                 $record->$field = $files;
@@ -536,8 +536,8 @@ class CrudController extends Controller {
             if (is_array($record->$field_name) && count($record->$field_name) > 0) {
                 $files = [];
                 foreach ($record->$field_name as $index => $file) {
-                    if (Storage::disk(env('FILESYSTEM_DRIVER','public'))->exists($file)) {
-                        $files[] = Storage::disk(env('FILESYSTEM_DRIVER','public'))->url($file);
+                    if (Storage::disk(env('STORAGE_DRIVER','public'))->exists($file)) {
+                        $files[] = Storage::disk(env('STORAGE_DRIVER','public'))->url($file);
                     }
                 }
                 $record->$field_name = $files;

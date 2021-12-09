@@ -14,7 +14,7 @@ class CreatePackagesTable extends Migration
     public function up()
     {
         Schema::create('packages', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->string('from',191)->nullable(true);
             $table->string('to',191)->nullable(true);
             $table->text('note')->nullable(true);
