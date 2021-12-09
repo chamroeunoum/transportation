@@ -2,6 +2,7 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import FooterComponent from './../../components/footer/copy-right.vue'
+import { Notify } from 'vant'
 </script>
 
 <template>
@@ -11,27 +12,29 @@ import FooterComponent from './../../components/footer/copy-right.vue'
         <img src="./../../assets/logo.png" alt="SCT Logo" class="w-full" >
       </div>
       <div class="w-full mx-auto my-4 text-lg">
+        ក្រុមហ៊ុន ដឹកជញ្ជូន សូនី កម្ពុជា<br/>
         Sony Cambodia Transportation
       </div>
-      <div class="w-full mx-auto my-4 text-left text-md">
-        Sign in
-      </div>
+      <div class="w-full mx-auto my-4 text-left text-md">ចូលប្រព័ន្ធ</div>
       <van-cell-group inset>
         <van-field
-          v-model="email"
-          label="Email"
-          placeholder="Email"
+          v-model="auth.email"
+          clearable
+          label="អ៊ីមែល"
+          placeholder="អ៊ីមែល"
+          @keyup.enter="login"
         />
         <van-field
-          v-model="password"
+          v-model="auth.password"
           type="password"
           clearable
-          label="Password"
-          placeholder="Password"
+          label="ពាក្យសម្ងាត់"
+          placeholder="ពាក្យសម្ងាត់"
+          @keyup.enter="login"
         />
       </van-cell-group>
-      <div class="w-full">
-        <router-link to="/receive">Sign in</router-link>
+      <div class="w-full mt-4">
+        <van-button type="primary" size="small" @click="login" :loading="btnLoginLoading" loading-text="Signing in..." class="px-8" >ចូល</van-button>
       </div>
       <div class="mt-16">
         <FooterComponent />
@@ -41,15 +44,85 @@ import FooterComponent from './../../components/footer/copy-right.vue'
 </template>
 <script>
 export default {
+  name: 'LoginTemplate' ,
   setup(){
     return {
       
     }
   },
-  data(){
-    btnLoginLoading: false
+  data(){ 
+    return {
+      auth: {
+        email: '' ,
+        password: '' ,
+      },
+      btnLoginLoading: false
+    }
   },
-  name: 'LoginTemplate'
+  methods:{
+    login(){
+      if( this.auth.email == "" || this.auth.email == null ){
+        Notify({
+          type: 'warning' ,
+          message: 'សូមបញ្ចូលអសយដ្ឋានសំបុត្ររបស់អ្នក។'
+        })
+        return false
+      }
+      if( this.auth.password == "" || this.auth.password == null ){
+        Notify({
+          type: 'warning' ,
+          message: 'សូមបញ្ចូលពាក្យសម្ងាត់របស់អ្នក។'
+        })
+        return false
+      }
+      this.btnLoginLoading = true
+      this.$store.dispatch('auth/login',{
+        email: this.auth.email ,
+        password: this.auth.password
+      }).then( res => {
+        console.log( res )
+        switch( res.status ){
+          case 200 :
+            /**
+             * Store the authenticated user into the store
+             */
+            this.$store.commit('auth/COMMIT_USER_TOKEN',{
+              user: res.data.user ,
+              token: res.data.token ,
+            })
+            Notify({
+              type: 'success' ,
+              message: "សួស្ដី, " + res.data.user.lastname + " " +  res.data.user.firstname
+            })
+            this.$router.push('/receive')
+          break;
+          default:
+            Notify({
+              type: 'warning' ,
+              message: res.data.message
+            })
+            break;
+        }
+        this.btnLoginLoading = false
+      }).catch( err => {
+        this.btnLoginLoading = false
+        if( err.response !== null ){
+          let message = err.response.status + ": " + err.response.statusText + ". " 
+          if( err.response.data !== null ){
+            for(var key in err.response.data.errors ){
+              message += err.response.data.errors[key]
+            }  
+          }
+          Notify({
+            type:'danger' ,
+            message: message 
+          })
+        }else{
+          console.log( err.response )
+        }
+      });
+    }
+  }
 }
 </script>
 <style>

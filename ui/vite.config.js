@@ -7,12 +7,11 @@ export default defineConfig({
     plugins: [
         vue(),
         styleImport({
-            libs: [{
-                libraryName: 'vant',
-                esModule: true,
-                resolveStyle: (name) => `vant/es/${name}/style`,
-            }, ],
+            libraryName: 'vant',
+            esModule: true,
+            resolveStyle: (name) => `${name}/style`,
         }),
+
     ],
     server: {
         // host: '192.168.1.42'

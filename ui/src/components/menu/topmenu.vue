@@ -1,11 +1,12 @@
 <template>
-  <div class="fixed bg-gray-100 top-0 left-0 right-0 flex h-16 p-2 mb-4 border-b border-gray-300" >
+  <div class="font-pvh fixed bg-gray-100 top-0 left-0 right-0 flex h-16 p-2 mb-4 border-b border-gray-300" >
     <div class="flex-none w-12 h-12">
       <router-link to="/dashboard">
         <img src="./../../assets/logo.png" class="w-full rounded-full" alt="SCT Logo" title="SCT Logo" />
       </router-link>
     </div>
-    <div class="flex-grow h-12 ">
+    <div class="flex-grow h-12 text-xl leading-10 ">
+      ការិយាល័យកណ្ដាល
       <!-- This item will grow -->
     </div>
     <div class="flex-none w-12 h-12 ...">

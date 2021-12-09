@@ -1,5 +1,5 @@
 <template>
-  <div v-if="false" class="fixed bottom-0 left-0 border-r top-16 w-60 bg-gray-100" >
+  <div class="fixed bottom-0 left-0 border-r top-16 w-60 bg-gray-100" >
     <!-- Menu -->
     <div v-if="sidebarToggle" class="absolute w-full sidebar">
       <!-- Menu Item -->
@@ -77,9 +77,7 @@
           </svg>
         </div>
         <!-- Label -->
-        <router-link to="/logout" class="flex-grow leading-10 text-left label " >
-          <div class="text-md">ចេញ</div>
-        </router-link>  
+        <a @click="logout" class="flex-grow leading-10 text-left label " >ចាកចេញ</a>  
       </div>
     </div> 
     <!-- <div class="sidebar-toggle">
@@ -95,6 +93,8 @@
 <script>
 import { ref } from 'vue'
 import Footer from './../../components/footer/copy-right.vue'
+import { Notify } from 'vant'
+
 export default {
   setup(){
     return {}
@@ -105,6 +105,7 @@ export default {
   name: 'sidebar-left' ,
   data() {
     return {
+      logoutConfirmationDialog: false ,
       sidebarToggle : true ,
       menus: [
         {
@@ -137,6 +138,32 @@ export default {
   methods: {
     toggleSidebarFunc(helper){
       this.sidebarToggle = helper
+    },
+    logout(){
+      /**
+       * Check whether the user has logged out already
+       */
+      if( this.$store.state.auth.user === null || this.$store.state.auth.token.access_token === "" ) {
+        Notify({
+          type: 'warning' ,
+          message: "គណនីបច្ចុប្បន្ន បានចាកចេញរួចហើយ។"
+        })
+        this.$router.push('/login')
+      }else{
+        /**
+         * Show confirm dialog
+         */
+        this.$store.dispatch('auth/logout',{
+          token : this.$store.getters['auth/getAuthorization']
+        }).then( res => {
+          Notify({
+            type: 'success' ,
+            message: res
+          })
+        }).catch( err => {
+          console.log( err )
+        }) 
+      }
     }
   }
 }
