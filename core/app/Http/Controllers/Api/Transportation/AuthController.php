@@ -38,8 +38,7 @@ class AuthController extends Controller
 
         if (!Auth::attempt($credentials)) {
             // if (!auth()->attempt($data)) {
-            //     return response(['error_message' => 'Incorrect Details. 
-            //     Please try again']);
+            //     return response(['error_message' => 'Incorrect Details. Please try again']);
             // }
             $user = User::where('email', $request->email)->limit(1)->first() ;
             if ( $user != null ){ 
@@ -48,6 +47,7 @@ class AuthController extends Controller
                  */
                 if( $user->active != 1 ){
                     return response()->json([
+                        'record' => false ,
                         'message' => 'គណនីត្រូវបានបិទ។'
                     ], 201);
                 }
@@ -57,17 +57,20 @@ class AuthController extends Controller
                 if( $user->email_verified_at == "" ) {
                     
                     return response()->json([
+                        'record' => false ,
                         'message' => 'អ្នកមិនទាន់បានបញ្ជាក់ អំពីការចុះឈ្មោះនៅឡើយ។ សូមបញ្ចាក់ការចុះឈ្មោះរបស់អ្នកជាមុនសិន។'
                     ], 201);
                 }
                 if( $user->deleted_at != null ) {
                     
                     return response()->json([
+                        'record' => false ,
                         'message' => 'គណនីនេះត្រូវបានដកចេញពីប្រព័ន្ធ។'
                     ], 201);
                 }
 
                 return response()->json([
+                    'record' => false ,
                     'message' => 'ពាក្យសម្ងាត់របស់អ្នកមិនត្រឹមត្រូវហើយ។'
                 ], 201);
                 
@@ -76,6 +79,7 @@ class AuthController extends Controller
                  * Account does exist but the password might miss type
                  */
                 return response()->json([
+                    'record' => false ,
                     'message' => 'អ៊ីមែលរបស់អ្នកមិនមានក្នុងប្រព័ន្ធឡើយ !'
                 ], 401);
             }
@@ -131,24 +135,24 @@ class AuthController extends Controller
         if( $request->user() != null ){
             $value = $request->bearerToken();
             if ($value) {
-                $id = (new Parser())->parse($value)->getHeader('jti');
-                $token = $request->user()->tokens()->find($id);
-                $token->revoke();
+                // $id = (new Parser())->parse($value)->getHeader('jti');
+                // $token = $request->user()->tokens()->find($id);
+                // $token->revoke();
                 $request->user()->token()->revoke();
                 return response()->json([
-                    // 'message' => 'អ្នកបានចាកចេញដោយជោគជ័យ !'
-                    'message' => 'Logout successful !'
+                    'record' => false ,
+                    'message' => 'អ្នកបានចាកចេញដោយជោគជ័យ !'
                 ], 200);
             }
             return response()->json([
-                // 'message' => 'មានបញ្ហាជាមួយ Access Token !'
-                'message' => 'There is a problem with Access Token !'
+                'record' => false ,
+                'message' => 'មានបញ្ហាជាមួយ Access Token !'
             ], 201);
         }
         Auth::logout();
         return response()->json([
-            'result' => Auth::user() ,
-            'message' => 'You have logout already !'
+            'record' => Auth::user() ,
+            'message' => 'អ្នកបានចាកចេញរួចហើយ!'
         ], 200);
     }
 }

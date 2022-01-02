@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s') ,
             'email' => 'chamroeunoum@gmail.com',
             'password' => bcrypt('1234567890+1'),
+            'active' => 1
             // 'password' => bcrypt('1234567890+1'),
         ]);
     }

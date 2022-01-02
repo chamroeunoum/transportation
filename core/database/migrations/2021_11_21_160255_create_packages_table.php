@@ -26,12 +26,13 @@ class CreatePackagesTable extends Migration
             $table->string('sender_phone',191)->default("");
             $table->string('receiver_phone',191)->default("");
             $table->float('price')->default(0);
+            $table->integer('payment_status',1)->default(0);
             $table->string('code',191)->default("");
             $table->integer('created_by')->default(0);
             $table->integer('updated_by')->default(0);
             $table->integer('deleted_by')->default(0);
             $table->timestamps();
-            $table->softDeletes();
+            $table->softDeletes()->nullable(true);
         });
     }
 

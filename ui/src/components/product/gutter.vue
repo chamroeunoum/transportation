@@ -5,18 +5,29 @@
       <div class="sct-transaction-new-package flex flex-row-reverse w-1/2">
         <div @click="toggleCreatePopup(true)" class="mx-2 w-8 h-8 mt-1 text-center hover:border-blue-300 duration-300 cursor-pointer" >
           <van-icon name="add-o" :size="32" class="hover:text-blue-600 " />
-          <!-- <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto w-4 h-4 mt-2 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg> -->
+        </div>
+        <div @click="$router.push('/package')" class="mx-2 ml-4 my-1 w-8 h-8 text-center hover:border-blue-300 duration-300 cursor-pointer" >
+          <Icon :size="30">
+            <Table />
+          </Icon>
         </div>
         <div class="w-1/2" >
           <input type="text" @keyup="filterProducts" v-model="search.value" class="bg-gray-100 px-2 h-8 my-1 w-full rounded border border-gray-200 focus:border-blue-600 hover:border-blue-600 " placeholder="ស្វែងរកឥវ៉ាន់តាមលេខកូដ" />
         </div>
-        <div class="w-1/4 leading-10" >
-          ចំនូនឥវ៉ាន់សរុប ៖ <strong class="font-dangrek text-blue-500 mx-2 text-xl ">{{ this.products.all.length }}</strong> ដុំ 
+        <div class="w-1/4 leading-10 text-blue-500" >
+          <strong class="font-dangrek  mx-2 text-xl ">{{ this.products.all.length + ' ដុំ' }}</strong>
         </div>
-        <div class="w-1/4 leading-10" >
-          តម្លៃសរុប ៖ <strong class="font-dangrek text-blue-500 mx-2 text-xl">{{ totalPrice }}</strong> ฿
+        <div class="w-1/3 leading-10 text-blue-600" >
+          <van-icon name="paid" />
+          <strong class="font-dangrek mx-2 text-xl">{{ totalPrice + ' ฿' }}</strong>
+        </div>
+        <div class="w-1/3 leading-10 text-red-600" >
+          <van-icon name="paid" />
+          <strong class="font-dangrek mx-2 text-xl">{{ totalPriceUnpaid + ' ฿' }}</strong>
+        </div>
+        <div class="w-1/3 leading-10 text-green-600" >
+          <van-icon name="paid" />
+          <strong class="font-dangrek  mx-2 text-xl">{{ totalPricePaid + ' ฿' }}</strong>
         </div>
       </div>
     </div>
@@ -47,14 +58,18 @@
         <van-icon name="send-gift-o" color="#1989fa"/>
         {{ record.dimension }}
       </div>
-      <div class="w-1/2 font-extrabold my-1" >
-        <van-icon name="paid" color="#1989fa"/>
-        {{ record.price }} ฿
+      <div :class="'w-full font-extrabold my-1 ' + ( record.payment_status == 1 ? 'text-green-600 ' : 'text-red-600 ' ) " >
+        <van-icon name="paid" />
+        {{ record.price }} ฿ - {{ record.payment_status == 1 ? "បង់រួច" : "មិនទាន់បង់" }}
       </div>
-      <div class="w-full font-extrabold mt-1 mb-1" >
-        <van-icon name="records" color="#1989fa"/>
+      <div class="w-full font-extrabold mt-1 mb-1 border-t py-4 " >
+        <!-- <van-icon name="records" color="#1989fa"/> -->
         {{ record.note }}
       </div>
+      <!-- <div v-if="record.client!==undefined" title="ឈ្មោះភ្ញៀវ" class="w-1/2 font-extrabold my-1 mx-auto" >
+        <van-icon name="records" color="#1989fa"/>
+        {{ record.client.lastname + ' ' + record.client.firstname }}
+      </div> -->
       <div class="w-1/2 font-extrabold my-1 mx-auto" >
         <qrcode-vue :value="record.code" :size="60" level="H" class="mx-auto" />
       </div>
@@ -77,127 +92,268 @@
     </div>
     <!-- Form create -->
     <div class="vcb-pop-create font-ktr">
-      <van-popup v-model:show="createPopToggle" class="p-8" >
-        <div class="font-bold my-4 text-xl">ព័ត៌មានបញ្ញើ</div>
-        <!-- Support Khmer -->
-        <!-- <qrcode-stream @decode="onDecode" ></qrcode-stream> -->
-        <!-- Support Khmer -->
-        <!-- <qrcode-vue value="អ៊ុំ ចំរើន" size="300" level="H" /> -->
-        <!-- Not support khmer -->
-        <!-- <vue3-barcode value="Chamroeun OUM" :height="50" /> -->
-        <van-divider />
-        <van-cell-group inset>
-          <!-- <van-field v-model="product.create.code" label="លេខកូដ" placeholder="លេខកូតសម្គាល់ប្រអប់ឥវ៉ាន់" /> -->
-          <van-field
-            v-model="product.create.from"
-            label="ផ្ញើចេញពី"
-            type="textarea"
-            placeholder="អសយដ្ឋានក្រុមហ៊ុន (សាខា)"
-            rows="1"
-            autosize
-            disabled
-          /> 
-          <van-field
-            v-model="product.create.to"
-            label="គោលដៅ"
-            type="textarea"
-            placeholder="គោលដៅដែលដែលត្រូវទៅ"
-            rows="1"
-            autosize
-          />
-          <van-field v-model="product.create.sender_phone" type="phone" label="លេខអ្នកផ្ញើរ" placeholder="លេខអ្នកផ្ញើរ" />
-          <van-field v-model="product.create.receiver_phone" type="phone" label="លេខអ្នកទទួល" placeholder="លេខអ្នកទទួល" />
-          <van-field v-model="product.create.weight" type="number" label="ទំងន់ (គីឡូ)" placeholder="ទំងន់ (គីឡូ)" />
-          <van-divider>ទំហំប្រអប់</van-divider>
-          <van-radio-group v-model="product.create.dimension" direction="horizontal" class="mx-4 my-6" label="ទំហំប្រអប់" placeholder="ទំហំប្រអប់" >
-            <van-radio name="60x40x20">60x40x20</van-radio>
-            <van-radio name="60x60x40">60x60x40</van-radio>
-            <van-radio name="20x10x10">20x10x10</van-radio>
-            <van-radio name="20x5x10">20x5x10</van-radio>
-          </van-radio-group>
-          <van-divider />
-          <van-field :step="1" v-model="product.create.price" type="number" label="តម្លៃ" placeholder="តម្លៃ" />
-          <van-field
-            v-model="product.create.note"
-            label="សម្គាល់"
-            type="textarea"
-            placeholder="សម្គាល់ផ្សេងៗ"
-            rows="3"
-            autosize
-          />
-        </van-cell-group>
-        <van-button :loading="savingLoading" loading-text="រក្សារទុក..." type="primary" class="my-4 w-1/2" @click="saveProduct()" >ផ្ញើ</van-button>
-      </van-popup>
+      <n-modal v-model:show="createPopToggle" transform-origin="center">
+        <n-card class="w-1/2 font-pvh text-xl" title="បន្ថែមបញ្ញើ" :bordered="false" size="small">
+          <template #header-extra>
+            <n-button type="success" @click="saveRecord()" >
+              <template #icon>
+                <n-icon>
+                  <save />
+                </n-icon>
+              </template>
+              រក្សារទុក
+            </n-button>
+          </template>
+          <!-- Form create -->
+          <div class="crud-create-form w-full border-t">
+            <div class=" mx-auto p-4 flex-wrap">
+              <div class="crud-form-panel w-full flex flex-wrap ">
+                <n-form 
+                  class="w-full text-left font-btb text-lg flex flex-wrap" 
+                  :label-width="80"
+                  :model="product.create"
+                  :rules="rules"
+                  size="large"
+                  ref="formRef"
+                >
+                  <n-form-item label="ឈ្មោះសាខា" path="from" class="w-2/5 mr-8" >
+                    <n-input :disabled="true" v-model:value="product.create.from" placeholder="ឈ្មោះសាខា" />
+                  </n-form-item>
+                  <n-form-item label="អតិថិជន" class="w-2/5 mr-8" >
+                    <n-select
+                      v-model:value="product.create.client_id"
+                      filterable
+                      clearable
+                      placeholder="សូមជ្រើសរើសអតិថិជន" 
+                      :options="clientfilters"
+                    />
+                  </n-form-item>
+                  <n-form-item label="គោលដៅរបស់ឥវ៉ាន់" path="to" class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.create.to" placeholder="គោលដៅរបស់ឥវ៉ាន់" />
+                  </n-form-item>
+                  <n-form-item label="លេខអ្នកផ្ញើ" path="sender_phone" class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.create.sender_phone" placeholder="លេខអ្នកផ្ញើ" />
+                  </n-form-item>
+                  <n-form-item label="លេខអ្នកទទួល" path="receiver_phone" class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.create.receiver_phone" placeholder="លេខអ្នកទទួល" />
+                  </n-form-item>
+                  <n-form-item label="តម្លៃផ្ញើ (បាត)" path="price" class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.create.price" placeholder="តម្លៃផ្ញើ" />
+                  </n-form-item>
+                  <n-form-item label="ទំងន់ (គីឡូ)"  class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.create.weight" placeholder="ទំងន់" />
+                  </n-form-item>
+                  <n-form-item label="ការបង់ប្រាក់" class="w-2/5 mr-8" >
+                    <n-radio-group
+                      v-model:value="product.create.payment_status"
+                      name="left-size"
+                      style="margin-bottom: 12px;"
+                    >
+                      <n-radio-button :value="1" >បង់ទីនេះ</n-radio-button>
+                      <n-radio-button :value="0">បង់ពេលដល់គោលដៅ</n-radio-button>
+                    </n-radio-group>
+                  </n-form-item>
+                  <!-- <n-form-item label="ប្រភេទប្រអប់" class="w-full " >
+                    <n-radio-group
+                      v-model:value="product.create.dimension"
+                      name="left-size"
+                      style="margin-bottom: 12px;"
+                    >
+                      <n-radio-button value="20x40x60" ><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>20x40x60</n-radio-button>
+                      <n-radio-button value="20x60x60"><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>20x60x60</n-radio-button>
+                      <n-radio-button value="40x40x60"><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>40x40x60</n-radio-button>
+                      <n-radio-button value="20x40x60" ><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>20x40x60</n-radio-button>
+                      <n-radio-button value="20x60x60"><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>20x60x60</n-radio-button>
+                      <n-radio-button value="40x40x60"><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>40x40x60</n-radio-button>
+                    </n-radio-group>
+                  </n-form-item> -->
+                  <n-form-item label="សម្គាល់" class="w-full" >
+                    <n-input 
+                      type="textarea"
+                      :autosize="{
+                        minRows: 3,
+                        maxRows: 5
+                      }"
+                      v-model:value="product.create.note" 
+                      placeholder="សម្គាល់" />
+                  </n-form-item>
+                </n-form>
+                <div class="w-1/2 h-8"></div>  
+              </div>
+            </div>
+          </div>
+          <!-- End form create -->
+          <template #footer>
+            
+          </template>
+        </n-card>
+      </n-modal>
+        
     </div>
     <!-- Form edit -->
     <div class="vcb-pop-edit font-ktr">
-      <van-popup v-model:show="editPopToggle" class="p-8" >
-        <div class="font-bold my-4 text-xl">កែប្រែព័ត៌មានបញ្ញើ</div>
-        <!-- Support Khmer -->
-        <!-- <qrcode-stream @decode="onDecode" ></qrcode-stream> -->
-        <!-- Support Khmer -->
-        <!-- <qrcode-vue value="អ៊ុំ ចំរើន" size="300" level="H" /> -->
-        <!-- Not support khmer -->
-        <!-- <vue3-barcode value="Chamroeun OUM" :height="50" /> -->
-        <van-divider />
-        <van-cell-group inset>
-          <!-- <van-field v-model="product.edit.code" label="លេខកូដ" placeholder="លេខកូតសម្គាល់ប្រអប់ឥវ៉ាន់" /> -->
-          <van-field
-            v-model="product.edit.from"
-            label="ផ្ញើចេញពី"
-            type="textarea"
-            placeholder="អសយដ្ឋានក្រុមហ៊ុន (សាខា)"
-            rows="1"
-            autosize
-            disabled
-          /> 
-          <van-field
-            v-model="product.edit.to"
-            label="គោលដៅ"
-            type="textarea"
-            placeholder="គោលដៅដែលដែលត្រូវទៅ"
-            rows="1"
-            autosize
-          />
-          <van-field v-model="product.edit.sender_phone" type="phone" label="លេខអ្នកផ្ញើរ" placeholder="លេខអ្នកផ្ញើរ" />
-          <van-field v-model="product.edit.receiver_phone" type="phone" label="លេខអ្នកទទួល" placeholder="លេខអ្នកទទួល" />
-          <van-field v-model="product.edit.weight" type="number" label="ទំងន់" placeholder="ទំងន់" />
-          <van-divider>ទំហំប្រអប់</van-divider>
-          <van-radio-group v-model="product.edit.dimension" direction="horizontal" class="mx-4 my-6" label="ទំហំប្រអប់" placeholder="ទំហំប្រអប់" >
-            <van-radio name="60x40x20">60x40x20</van-radio>
-            <van-radio name="60x60x40">60x60x40</van-radio>
-            <van-radio name="20x10x10">20x10x10</van-radio>
-            <van-radio name="20x5x10">20x5x10</van-radio>
-          </van-radio-group>
-          <van-divider />
-          <van-field :step="1" v-model="product.edit.price" type="number" label="តម្លៃ" placeholder="តម្លៃ" />
-          <van-field
-            v-model="product.edit.note"
-            label="សម្គាល់"
-            type="textarea"
-            placeholder="សម្គាល់ផ្សេងៗ"
-            rows="3"
-            autosize
-          />
-        </van-cell-group>
-        <van-button :loading="editLoading" loading-text="រក្សារទុក..." type="primary" class="my-4 w-1/2" @click="updateProduct()" >រក្សារទុក</van-button>
-      </van-popup>
+      <n-modal v-model:show="editPopToggle" transform-origin="center">
+        <n-card class="w-1/2 font-pvh text-xl" title="កែប្រែបញ្ញើ" :bordered="false" size="small">
+          <template #header-extra>
+            <n-button type="success" @click="updateRecord()" >
+              <template #icon>
+                <n-icon>
+                  <save />
+                </n-icon>
+              </template>
+              រក្សារទុក
+            </n-button>
+          </template>
+          <!-- Form create -->
+          <div class="crud-create-form w-full border-t">
+            <div class=" mx-auto p-4 flex-wrap">
+              <div class="crud-form-panel w-full flex flex-wrap ">
+                <n-form 
+                  class="w-full text-left font-btb text-lg flex flex-wrap" 
+                  :label-width="80"
+                  :model="product.create"
+                  :rules="rules"
+                  size="large"
+                  ref="formRef"
+                >
+                  <n-form-item label="ឈ្មោះសាខា" path="from" class="w-2/5 mr-8" >
+                    <n-input :disabled="true" v-model:value="product.edit.from" placeholder="ឈ្មោះសាខា" />
+                  </n-form-item>
+                  <n-form-item label="អតិថិជន" class="w-2/5 mr-8" >
+                    <n-select
+                      v-model:value="product.edit.client_id"
+                      filterable
+                      clearable
+                      placeholder="សូមជ្រើសរើសអតិថិជន" 
+                      :options="clientfilters"
+                    />
+                  </n-form-item>
+                  <n-form-item label="គោលដៅរបស់ឥវ៉ាន់" path="to" class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.edit.to" placeholder="គោលដៅរបស់ឥវ៉ាន់" />
+                  </n-form-item>
+                  <n-form-item label="លេខអ្នកផ្ញើ" path="sender_phone" class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.edit.sender_phone" placeholder="លេខអ្នកផ្ញើ" />
+                  </n-form-item>
+                  <n-form-item label="លេខអ្នកទទួល" path="receiver_phone" class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.edit.receiver_phone" placeholder="លេខអ្នកទទួល" />
+                  </n-form-item>
+                  <n-form-item label="តម្លៃផ្ញើ (បាត)" path="price" class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.edit.price" placeholder="តម្លៃផ្ញើ" />
+                  </n-form-item>
+                  <n-form-item label="ទំងន់ (គីឡូ)"  class="w-2/5 mr-8" >
+                    <n-input v-model:value="product.edit.weight" placeholder="ទំងន់" />
+                  </n-form-item>
+                  <n-form-item label="ការបង់ប្រាក់" class="w-2/5 mr-8" >
+                    <n-radio-group
+                      v-model:value="product.edit.payment_status"
+                      name="left-size"
+                      style="margin-bottom: 12px;"
+                    >
+                      <n-radio-button :value="1" >បង់ទីនេះ</n-radio-button>
+                      <n-radio-button :value="0">បង់ពេលដល់គោលដៅ</n-radio-button>
+                    </n-radio-group>
+                  </n-form-item>
+                  <!-- <n-form-item label="ប្រភេទប្រអប់" class="w-full " >
+                    <n-radio-group
+                      v-model:value="product.edit.dimension"
+                      name="left-size"
+                      style="margin-bottom: 12px;"
+                    >
+                      <n-radio-button value="20x40x60" ><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>20x40x60</n-radio-button>
+                      <n-radio-button value="20x60x60"><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>20x60x60</n-radio-button>
+                      <n-radio-button value="40x40x60"><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>40x40x60</n-radio-button>
+                      <n-radio-button value="20x40x60" ><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>20x40x60</n-radio-button>
+                      <n-radio-button value="20x60x60"><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>20x60x60</n-radio-button>
+                      <n-radio-button value="40x40x60"><Icon size="15" class="mr-2 mt-1" ><Box16Regular /></Icon>40x40x60</n-radio-button>
+                    </n-radio-group>
+                  </n-form-item> -->
+                  <n-form-item label="សម្គាល់" class="w-full" >
+                    <n-input 
+                      type="textarea"
+                      :autosize="{
+                        minRows: 3,
+                        maxRows: 5
+                      }"
+                      v-model:value="product.edit.note" 
+                      placeholder="សម្គាល់" />
+                  </n-form-item>
+                </n-form>
+                <div class="w-1/2 h-8"></div>  
+              </div>
+            </div>
+          </div>
+          <!-- End form create -->
+          <template #footer>
+            
+          </template>
+        </n-card>
+      </n-modal>
     </div>
   </div>
 </template>
 
 <script>
 import QrcodeVue from 'qrcode.vue'
-import { Notify, Dialog , DatetimePicker} from 'vant'
+import { Notify, Dialog } from 'vant'
+import { Table } from '@vicons/carbon'
+import { Icon } from '@vicons/utils'
+import { ref, reactive, computed } from 'vue'
+import { Save } from "@vicons/carbon"
+import { ArrowBackIosNewRound } from '@vicons/material'
+import { Box16Regular } from '@vicons/fluent'
+
 export default {
-  components: {
-    QrcodeVue
+  setup () {
+    return {
+      rules: {
+        to: {
+          required: true,
+          message: 'សូមបញ្ចូលកន្លែងបញ្ជូនឥវ៉ាន់ទៅ',
+          trigger: 'blur'
+        },
+        sender_phone: {
+          required: true,
+          message: 'សូមបញ្ចូលលេខទូរស័ព្ទអ្នកផ្ញើ',
+          trigger: [ 'blur']
+        },
+        receiver_phone: {
+          required: true,
+          message: 'សូមបញ្ចូលលេខទូរស័ព្ទអ្នកទទួល',
+          trigger: [ 'blur']
+        },
+        price: {
+          required: true,
+          message: 'សូមបញ្ចូលតម្លៃផ្ញើ',
+          trigger: [ 'blur']
+        }
+      },
+      handleValidateClick (e) {
+        e.preventDefault()
+        formRef.value.validate((errors) => {
+          if (!errors) {
+            message.success('Valid')
+          } else {
+            console.log(errors)
+            message.error('Invalid')
+          }
+        })
+      }
+    }
   },
-  setup(){
-    return {}
+  components: {
+    QrcodeVue,
+    Table,
+    Icon,
+    Save, 
+    ArrowBackIosNewRound,
+    Box16Regular
   },
   data(){
     return {
+      model: {
+        name: 'product' ,
+        title: "បញ្ញើ"
+      },
       createPopToggle : false ,
       editPopToggle: false ,
       products: {
@@ -207,6 +363,7 @@ export default {
       product: {
         create: {
           id: 0 ,
+          client_id: null ,
           code: '' ,
           from: 'បាងកក' ,
           to: '' ,
@@ -215,10 +372,12 @@ export default {
           weight: '' ,
           dimension: '60x40x20' ,
           price: '' ,
-          note: ''
+          note: '',
+          payment_status: 1
         },
         edit: {
           id: 0 ,
+          client_id: null ,
           code: '' ,
           from: 'បាងកក' ,
           to: '' ,
@@ -227,11 +386,13 @@ export default {
           weight: '' ,
           dimension: '60x40x20' ,
           price: '' ,
-          note: ''
+          note: '',
+          payment_status: 1
         }
       },
-      clearProduct: {
+      clearRecord: {
         id: 0 ,
+        client_id: null ,
         code: '' ,
         from: 'បាងកក' ,
         to: '' ,
@@ -240,12 +401,17 @@ export default {
         weight: '' ,
         dimension: '60x40x20' ,
         price: '' ,
-        note: ''
+        note: '',
+        payment_status: 1
       },
       savingLoading: false ,
       editLoading: false ,
       search: {
         value: ''
+      },
+      client: {
+        records: [] ,
+        client_id: ''
       }
     }
   },
@@ -257,13 +423,54 @@ export default {
       }
       return total
     },
+    totalPricePaid(){
+      let total = 0 
+      for(var i in this.products.all ){
+        total += this.products.all[i].payment_status == 1 ? this.products.all[i].price : 0 
+      }
+      return total
+    },
+    totalPriceUnpaid(){
+      let total = 0 
+      for(var i in this.products.all ){
+        total += this.products.all[i].payment_status != 1 ? this.products.all[i].price : 0 
+      }
+      return total
+    },
     sctTransactionDate(){
       let now = new Date()
-      return now.getFullYear() + "-" + now.getMonth() + "-" + now.getDay()
+      return now.getFullYear() + "-" + ( now.getMonth() + 1 ) + "-" + now.getDate()
+    },
+    clientfilters(){
+      // let filter = this.client.records.filter( c => 
+      //   ( 
+      //     ( c.firstname !== null && c.firstname.indexOf( this.client.client_id ) != -1 ) || 
+      //     ( c.lastname !== null && c.lastname.indexOf( this.client.client_id ) != -1 ) ||
+      //     ( c.phone !== null && c.phone.indexOf( this.client.client_id ) != -1 ) ||
+      //     ( c.email !== null && c.email.indexOf( this.client.client_id ) != -1 )
+      //   )
+      // )
+      // filter = filter.length <= 0 ? this.client.records : filter
+      return this.client.records.map( ( c ) => { return {
+        label: ( c.lastname !== null ? c.lastname + ' ' : '' ) +
+          ( c.firstname !== null ? c.firstname + ' ' : '' ) +
+          ( c.phone !== null ? c.phone + ' ' : '' ) +
+          ( c.email !== null ? c.email + ' ' : '' ) ,
+        value: c.id 
+      } } )
     }
   },
   beforeMount(){
     this.getRecords()
+    this.$store.dispatch('client/list').then( res => {
+      switch( res.status ){
+        case 200:
+          this.client.records = res.data.records.records
+        default: 
+          break;
+      }
+      console.log( this.client.records )
+    }).catch( err => console.log( err ) )
   },
   mounted(){
     
@@ -276,7 +483,6 @@ export default {
         confirmButtonText: "លុប" ,
         cancelButtonText: "ទេ"
       }).then( () => {
-        console.log( "ok" )
         /**
          * onConfirm
          */
@@ -311,25 +517,30 @@ export default {
     edit(record){
       this.product.edit = {
         id: record.id ,
+        client_id: record.client_id > 0 ? record.client_id : null ,
         code: record.code ,
         from: record.from ,
         to: record.to ,
         sender_phone: record.sender_phone ,
         receiver_phone: record.receiver_phone ,
-        weight: parseInt( record.weight ) ,
+        weight: record.weight + '' ,
         dimension: record.dimension ,
-        price: parseFloat( record.price ),
-        note: record.note
+        price: record.price + '',
+        note: record.note,
+        payment_status: record.payment_status
       }
       this.toggleEditPopup(true)
     },
     print(record){
 
     },
-    updateProduct(){
+    updateRecord(){
       if( !this.validateData(this.product.edit) ){
         return false
       }
+      // console.log( this.product.edit.client_id )
+      // return false
+      this.product.edit.client_id = this.product.edit.client_id > 0 ? this.product.edit.client_id : 0
       this.editLoading = true 
       this.$store.dispatch('product/update', this.product.edit ).then( res => {
         switch( res.status ){
@@ -340,7 +551,7 @@ export default {
 
             break;
         }
-        this.product.edit = this.clearProduct
+        this.product.edit = this.clearRecord
         this.toggleEditPopup(false)
         this.editLoading = false 
       }).catch( err => {
@@ -355,7 +566,7 @@ export default {
           this.products.matched.push( this.products.all[i] )
         }
       }
-      console.log( this.products.matched )
+      
       if( this.products.matched.length <= 0 ) {
         this.products.matched = this.products.all
       }
@@ -411,10 +622,11 @@ export default {
     toggleEditPopup(helper) {
       this.editPopToggle = helper === true ? helper : false 
     },
-    saveProduct(){
+    saveRecord(){
       if( !this.validateData(this.product.create) ){
         return false
       }
+      
       this.savingLoading = true 
       this.$store.dispatch('product/create', this.product.create ).then( res => {
         switch( res.status ){
@@ -425,7 +637,7 @@ export default {
 
             break;
         }
-        this.product.create = this.clearProduct
+        this.product.create = this.clearRecord
         this.toggleCreatePopup(false)
         this.savingLoading = false 
       }).catch( err => {

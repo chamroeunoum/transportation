@@ -1,24 +1,67 @@
-
-export const getToken = () => {
-  let token = ''
+export const authLogout = () => {
   try {
-    token = localStorage.getItem('access_token');
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
   } catch (error) {
     console.log(error)
   }
-  return token
+}
+export const isAuth = () => {
+  try {
+    if( localStorage.getItem('token') === null ){
+      return false
+    }
+    return true
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const getToken = () => {
+  try {
+    return JSON.parse( localStorage.getItem('token') )
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const getAuthorization = () => {
+  try {
+    return getToken().token_type + ' ' + getToken().access_token
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const getAccessToken = () => {
+  try {
+    return getToken().access_token
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const getAccessTokenType = () => {
+  try {
+    return getToken().token_type
+  } catch (error) {
+    console.log(error)
+  }
+}
+export const getExpiresAt = () => {
+  try {
+    return getToken().expires_at
+  } catch (error) {
+    console.log(error)
+  }
 }
 export const setToken = (token) => {
-    localStorage.setItem('access_token',token);
+  localStorage.setItem('token', JSON.stringify( token ));
 }
 
-export const getCustomer = () => {
-    let customer = null
-    try {
-        customer = JSON.parse(localStorage.getItem('customer'))
-    } catch (error) {}
-    return customer
+export const getUser = () => {
+  try {
+    return JSON.parse(localStorage.getItem('user'))
+  } catch (error) {
+    console.log(error)
+  }
 }
-export const setCustomer = (data) => {
-    localStorage.setItem('customer',JSON.stringify(data));
+export const setUser = (user) => {
+  localStorage.setItem('user',JSON.stringify(user));
 }

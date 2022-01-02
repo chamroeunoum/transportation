@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bottom-0 left-0 border-r top-16 w-60 bg-gray-100" >
+  <div class="fixed bottom-0 left-0 border-r top-16 w-60 bg-gray-100 font-btb text-lg" >
     <!-- Menu -->
     <div v-if="sidebarToggle" class="absolute w-full sidebar">
       <!-- Menu Item -->
@@ -24,9 +24,9 @@
           </svg>
         </div>
         <!-- Label -->
-        <router-link to="/user" class="flex-grow leading-10 text-left label " >
+        <router-link to="/client" class="flex-grow leading-10 text-left label " >
           <div class="text-md">អតិថិជន</div>
-        </router-link>  
+        </router-link>
       </div>
       <!-- Menu Item -->
       <div class="flex w-full h-12 p-1 bg-gray-100 border-b">
@@ -37,22 +37,21 @@
         </svg>
         </div>
         <!-- Label -->
-        <router-link to="/package" class="flex-grow leading-10 text-left label " >
+        <router-link to="/receive" class="flex-grow leading-10 text-left label " >
           <div class="text-md">ឥវ៉ាន់</div>
         </router-link>  
       </div>
-      <!-- Menu Item -->
       <div class="flex w-full h-12 p-1 bg-gray-100 border-b">
         <!-- iCon -->
         <div class="flex-grow-0 w-10 h-10 p-2 text-blue-500 icon">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z" />
           </svg>
         </div>
         <!-- Label -->
-        <router-link to="/user" class="flex-grow leading-10 text-left label " >
-          <div class="text-md">ភ្នាក់ងារ</div>
-        </router-link>  
+        <router-link to="/staff" class="flex-grow leading-10 text-left label " >
+          <div class="text-md">បុគ្គលិក</div>
+        </router-link>
       </div>
       <!-- Menu Item -->
       <div class="flex w-full h-12 p-1 bg-gray-100 border-b">
@@ -94,10 +93,53 @@
 import { ref } from 'vue'
 import Footer from './../../components/footer/copy-right.vue'
 import { Notify } from 'vant'
+import { isAuth, authLogout } from './../../plugins/authentication'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+import { useDialog , useMessage } from 'naive-ui'
 
 export default {
   setup(){
-    return {}
+    const dialog = useDialog();
+    const message = useMessage();
+    const store = useStore();
+    const router = useRouter()
+    async function logout(){
+      const d = dialog.warning({
+        title: 'ចាកចេញ',
+        content: 'តើអ្នកចង់ចាកចេញមែនទេ?',
+        positiveText: 'បាទ / ចាស',
+        negativeText: 'ទេ',
+        onPositiveClick: () => {
+          /**
+           * Check whether the user has logged out already
+           */
+          if( isAuth() ) {
+            /**
+             * Show confirm dialog
+             */
+            d.loading = true
+            store.dispatch('auth/logout').then( res => {
+              authLogout()
+              message.success(res.data.message)
+              d.loading = false
+              router.push('/login')
+            }).catch( err => {
+              console.log( err )
+            })
+          }else{
+            router.push('/login')
+          }
+        },
+        // onNegativeClick: () => {
+        //   message.error('Not Sure')
+        // }
+      })
+    }
+
+    return {
+      logout
+    }
   },
   components: {
     Footer
@@ -138,32 +180,6 @@ export default {
   methods: {
     toggleSidebarFunc(helper){
       this.sidebarToggle = helper
-    },
-    logout(){
-      /**
-       * Check whether the user has logged out already
-       */
-      if( this.$store.state.auth.user === null || this.$store.state.auth.token.access_token === "" ) {
-        Notify({
-          type: 'warning' ,
-          message: "គណនីបច្ចុប្បន្ន បានចាកចេញរួចហើយ។"
-        })
-        this.$router.push('/login')
-      }else{
-        /**
-         * Show confirm dialog
-         */
-        this.$store.dispatch('auth/logout',{
-          token : this.$store.getters['auth/getAuthorization']
-        }).then( res => {
-          Notify({
-            type: 'success' ,
-            message: res
-          })
-        }).catch( err => {
-          console.log( err )
-        }) 
-      }
     }
   }
 }

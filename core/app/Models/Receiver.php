@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Receiver extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     public function packages(){
         return $this->hasMany('\App\Models\Package','receiver_id','id');

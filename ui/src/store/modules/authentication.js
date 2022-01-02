@@ -1,13 +1,14 @@
 import auth from '../../api/auth'
-import { Notify } from 'vant'
+import './../../plugins/authentication'
+import { setToken, setUser } from './../../plugins/authentication'
 
 // initial state
 const state = () => ({
   user: null ,
   token: {
-    access_token: "" ,
-    expires_at: "" ,
-    token_type: ""
+    access_token: null ,
+    expires_at: new Date() ,
+    token_type: "Bearer"
   }
 })
 
@@ -17,8 +18,7 @@ const getters = {
     return state.token.token_type + " " + state.token.access_token 
   },
   checkAuth(state, getters, rootState ){
-    let now = new Date()
-    return state.token.access_token !== "" && ( state.token.expires_at < now )
+    return state.token.access_token !== "" && ( new Date(state.token.expires_at) >= new Date() )
   }
 }
 
@@ -54,15 +54,11 @@ const actions = {
 
 // mutations
 const mutations = {
-  // increment (state) {
-  //   // `state` is the local module state
-  //   state.count++
-  // }
-  COMMIT_USER_TOKEN (state, { user, token }) {
-    state.user = user 
-    state.token.access_token = token.access_token
-    state.token.expires_at = token.expires_at
-    state.token.token_type = token.token_type
+  setAuthentication (state, { user, token }) {
+    state.user = user
+    state.token = token
+    setToken(token)
+    setUser(user)
   }
 }
 

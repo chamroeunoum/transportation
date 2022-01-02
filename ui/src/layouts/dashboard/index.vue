@@ -1,17 +1,19 @@
 <template>
   <div class="relative w-full min-h-screen bg-gray-50 bg-center bg-cover bg-background" oncontextmenu="return false; " >
     <!-- Top menu -->
-    <div class="absolute p-4 top-16 right-0 bottom-0 left-0">
+    <div class="absolute p-4 top-16 right-0 bottom-0 left-60 ">
       <router-view ></router-view>  
     </div>
-    <SidebarLeft v-if="false" />
+    <SidebarLeft />
     <Topmenu />
+    <!-- <Dock /> -->
   </div>
 </template>
 
 <script>
 import { ref } from 'vue'
 import Topmenu from './../../components/menu/topmenu.vue'
+import Dock from './dock.vue'
 import SidebarLeft from './../../components/sidebars/sidebar-left.vue'
 export default {
     setup() {
@@ -27,7 +29,8 @@ export default {
     methods: {},
     components: { 
       Topmenu ,
-      SidebarLeft
+      SidebarLeft ,
+      Dock
     }
 }
 </script>

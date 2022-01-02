@@ -49,9 +49,10 @@ class CrudController extends Controller {
      * @param \Illuminate\Http\Request
      * @return \Illuminate\Http\Response
      */
-    public function getListBuilder()
+    public function getListBuilder($withTrashed=false)
     {
         $query_builder = $this->model->select($this->fields) ;
+        if( $withTrashed ) $query_builder = $query_builder->withTrashed();
         /** Start checking filters */
         if (isset($this->request->where) && !empty($this->request->where)) {
             $query_builder = $query_builder->where(function ($query) {

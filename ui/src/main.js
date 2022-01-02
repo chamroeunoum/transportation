@@ -8,6 +8,8 @@ import VueQrcodeReader from "vue3-qrcode-reader";
 import Vant from 'vant';
 import 'vant/lib/index.css';
 
+import NaiveUI from 'naive-ui'
+
 import VueToast from 'vue-toast-notification';
 import 'vue-toast-notification/dist/theme-sugar.css';
 
@@ -44,4 +46,5 @@ app.use(VueQrcodeReader)
 app.use(router)
 app.use(Vant)
 app.use(VueToast)
+app.use(NaiveUI)
 app.mount('#app')

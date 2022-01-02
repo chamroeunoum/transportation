@@ -43,6 +43,7 @@ import { Notify } from 'vant'
   </div>
 </template>
 <script>
+import './../../plugins/authentication'
 export default {
   name: 'LoginTemplate' ,
   setup(){
@@ -80,13 +81,12 @@ export default {
         email: this.auth.email ,
         password: this.auth.password
       }).then( res => {
-        console.log( res )
         switch( res.status ){
           case 200 :
             /**
              * Store the authenticated user into the store
              */
-            this.$store.commit('auth/COMMIT_USER_TOKEN',{
+            this.$store.commit('auth/setAuthentication',{
               user: res.data.user ,
               token: res.data.token ,
             })
@@ -105,6 +105,7 @@ export default {
         }
         this.btnLoginLoading = false
       }).catch( err => {
+        console.log( err )
         this.btnLoginLoading = false
         if( err.response !== null ){
           let message = err.response.status + ": " + err.response.statusText + ". " 

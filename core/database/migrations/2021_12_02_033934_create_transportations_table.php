@@ -14,8 +14,9 @@ class CreateTransportationsTable extends Migration
     public function up()
     {
         Schema::create('transportations', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->timestamps();
+            $table->softDeletes()->nullable(true);
         });
     }
 

@@ -1,5 +1,5 @@
 import axios from "axios"
-
+import { getAuthorization } from "../plugins/authentication"
 export default {
   async login(url,params){
     return await axios({
@@ -8,12 +8,12 @@ export default {
       data: params
     })
   },
-  async logout(url,params){
+  async logout(url){
     return await axios({
       method: 'post' ,
       url: url ,
       headers: {
-        'Authorization' : params.token
+        'Authorization' : getAuthorization()
       }
     })
   },
@@ -23,7 +23,7 @@ export default {
       url: url ,
       data: params ,
       headers: {
-        'Authorization' : this.$store.getters['auth/getAuthorization']
+        'Authorization' : getAuthorization()
       }
     })
   },
@@ -33,7 +33,7 @@ export default {
       url: url ,
       data: params ,
       headers: {
-        'Authorization' : this.$store.getters['auth/getAuthorization']
+        'Authorization' : getAuthorization()
       }
     })
   },
@@ -44,7 +44,7 @@ export default {
       url: url ,
       data: params ,
       headers: {
-        'Authorization' : this.$store.getters['auth/getAuthorization']
+        'Authorization' : getAuthorization()
       }
     })
   },
@@ -54,7 +54,7 @@ export default {
       url: url ,
       data: params ,
       headers: {
-        'Authorization' : this.$store.getters['auth/getAuthorization']
+        'Authorization' : getAuthorization()
       }
     })
   }
