@@ -13,10 +13,9 @@ class ClientController extends Controller
      */
     public function index(Request $request){
         $crud = new CrudController( new RecordModel, $request , [ 'id', 'firstname', 'lastname' , 'phone', 'address', 'email', 'photo' ,"created_at" ,"updated_at" ,"deleted_at" ]);
-        return response()->json([
-            'records' => $crud->pagination(true,$crud->getListBuilder() ) ,
-            'message' => 'Listing ready.'
-        ],200);
+        $responseMessage = $crud->pagination(true,$crud->getListBuilder() ) ;
+        $responseMessage['message'] = 'អានព័ត៌មានរួចរាល់';
+        return response()->json( $responseMessage ,200);
     }
     /**
      * Read package
@@ -50,7 +49,7 @@ class ClientController extends Controller
         }
         return response()->json([
             'record' => null ,
-            'message' => 'There is problem while saving data.'
+            'message' => 'មានបញ្ហាក្នុងពេលលុប'
         ],412);
     }
     /**
@@ -66,7 +65,7 @@ class ClientController extends Controller
         }
         return response()->json([
             'record' => null ,
-            'message' => 'There is problem while updating data.'
+            'message' => 'មានបញ្ហាក្នុងពេលលុប'
         ],412);
     }
     /**
@@ -78,17 +77,17 @@ class ClientController extends Controller
             if( $crud->delete() ){
                 return response()->json([
                     'record' => $record ,
-                    'message' => 'Matched data has been deleted.'
+                    'message' => 'លុបរួចរាល់'
                 ],200);
             }
             return response()->json([
                 'record' => null ,
-                'message' => 'There is something wrong while deleting data.'
+                'message' => 'មានបញ្ហាក្នុងពេលលុប'
             ],412);
         }
         return response()->json([
             'record' => null ,
-            'message' => 'No data found for deleting.'
+            'message' => 'មិនមានទិន្នន័យសម្រាប់លុប'
         ],412);
     }
     /**

@@ -15,7 +15,7 @@ class UserController extends Controller
     public function index(Request $request){
         $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
         $responseMessage = $crud->pagination(true,$crud->getListBuilder() ) ;
-        $responseMessage['message'] = 'Ready loaded.';
+        $responseMessage['message'] = 'អានព័ត៌មានរួចរាល់';
         return response()->json( $responseMessage ,200);
     }
     /**
@@ -26,31 +26,36 @@ class UserController extends Controller
         if( ($record = $crud->read() ) ){
             return response()->json([
                 'record' => $record ,
-                'message' => 'Read loaded.'
+                'message' => 'អានព័ត៌មានរួចរាល់'
             ],200);
         }
         return response()->json([
             'record' => $request->id ,
-            'message' => 'No data found.'
+            'message' => 'មិនមានព័ត៌មានឡើយ'
         ],412);
     }
     /**
      * Change password
      */
     public function changePassword(Request $request){
-        $user = $request->user ;
-        $user->password = bcrypt( $request->password );
-        $record->save();
+        if( ( $user = \App\Models\User::find($request->id) ) !== null ){
+            $user->password = bcrypt( $request->password );
+            $user->save();
+            return response()->json([
+                'record' => $user ,
+                'message' => 'ផ្លាស់ប្ដូរពាក្យសម្ងាត់រួចរាល់'
+            ],200);
+        }
         return response()->json([
-            'record' => $record ,
-            'message' => 'ផ្លាស់ប្ដូរពាក្យសម្ងាត់បាន.'
-        ],200);
+            'record' => $request->id ,
+            'message' => 'មិនមានព័ត៌មានឡើយ'
+        ],412);
     }
     /**
      * Create package
      */
     public function create(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username', 'password','firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
         if( ( $record = $crud->create() ) ){
             $record->password = bcrypt( $request->password );
             $record->active = 1 ;
@@ -90,17 +95,17 @@ class UserController extends Controller
             if( $crud->delete() ){
                 return response()->json([
                     'record' => $record ,
-                    'message' => 'Matched data has been deleted.'
+                    'message' => 'បានលុបព័ត៌មានរួចរាល់'
                 ],200);
             }
             return response()->json([
                 'record' => null ,
-                'message' => 'There is something wrong while deleting data.'
+                'message' => 'មានកំហុសក្នុងពេលលុបព័ត៌មាន'
             ],412);
         }
         return response()->json([
             'record' => null ,
-            'message' => 'No data found for deleting.'
+            'message' => 'មិនមានព័ត៌មានដើម្បីលុបឡើយ'
         ],412);
     }
     /**
@@ -110,7 +115,7 @@ class UserController extends Controller
         $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
         return response()->json([
             'records' => $crud->getRecords() ,
-            'message' => 'Compact listing ready.'
+            'message' => 'អានព័ត៌មានរួចរាល់'
         ],200);
     }
 }

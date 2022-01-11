@@ -44,7 +44,7 @@ Route::group([
         /**
          * Package
          */
-        Route::get('package',[PackageController::class,"index"]);
+        Route::put('package',[PackageController::class,"index"]);
         Route::get('package/{id}',[PackageController::class,"read"]);
         Route::post('package/create',[PackageController::class,"create"]);
         Route::post('package/update',[PackageController::class,"update"]);
@@ -54,7 +54,7 @@ Route::group([
         /**
          * User
          */
-        Route::get('user',[UserController::class,"index"]);
+        Route::put('user',[UserController::class,"index"]);
         Route::get('user/{id}',[UserController::class,"read"]);
         Route::post('user/create',[UserController::class,"create"]);
         Route::post('user/update',[UserController::class,"update"]);
@@ -65,7 +65,7 @@ Route::group([
         /**
          * Client
          */
-        Route::get('client',[ClientController::class,"index"]);
+        Route::put('client',[ClientController::class,"index"]);
         Route::get('client/{id}',[ClientController::class,"read"]);
         Route::post('client/create',[ClientController::class,"create"]);
         Route::post('client/update',[ClientController::class,"update"]);
@@ -75,7 +75,7 @@ Route::group([
         /**
          * Staff
          */
-        Route::get('staff',[StaffController::class,"index"]);
+        Route::put('staff',[StaffController::class,"index"]);
         Route::get('staff/{id}',[StaffController::class,"read"]);
         Route::post('staff/create',[StaffController::class,"create"]);
         Route::post('staff/update',[StaffController::class,"update"]);

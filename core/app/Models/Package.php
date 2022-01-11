@@ -10,7 +10,7 @@ class Package extends Model
 {
     use HasFactory, SoftDeletes;
     protected $guarded = ['id'];
-    protected $fillable = ['note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','payment_status', 'receiver_phone','price','code', 'from','to','created_at','updated_at','created_by','updated_by'];
+    protected $fillable = ['note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','payment_status', 'receiver_phone','price','code', 'from','to','created_at','updated_at','created_by','updated_by','total_packages'];
 
     /**
      * Relationships
