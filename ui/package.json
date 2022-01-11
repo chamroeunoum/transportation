@@ -23,6 +23,7 @@
     "vue-router": "^4.0.12",
     "vue-toast-notification": "^2.0.1",
     "vue3-barcode": "^1.0.1",
+    "vue3-charts": "^1.1.27",
     "vue3-qrcode-reader": "0.0.1",
     "vuex": "^4.0.2"
   },

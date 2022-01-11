@@ -60,7 +60,7 @@
       </table>
     </div>
     <!-- Pagination of crud -->
-    <div class="vcb-table-pagination">
+    <div v-if="false" class="vcb-table-pagination">
       <!-- First -->
       <!-- Previous -->
       <div class="vcb-pagination-page" v-html='"<"' ></div>
@@ -128,7 +128,12 @@ export default {
     }
   },
   beforeMount(){
-    this.$store.dispatch('product/list').then(res => {
+    this.$store.dispatch('product/list',{
+      pagination: {
+        perPage: 100 ,
+        page: 1
+      }
+    }).then(res => {
       this.$store.commit('product/setRecords',res.data.records)
     }).catch( err => {
       console.log( err )

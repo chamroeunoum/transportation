@@ -2,7 +2,7 @@
   <!-- Form edit account -->
     <div class="vcb-pop-create font-ktr">
       <n-modal v-model:show="show" :on-after-leave="onClose" transform-origin="center">
-        <n-card class="w-1/2 font-pvh text-xl" :title="'បន្ថែម ' + model.title" :bordered="false" size="small">
+        <n-card class="w-1/2 font-pvh text-xl" :title="'បន្ថែមព័ត៌មាន ' + model.title" :bordered="false" size="small">
           <template #header-extra>
             <n-button type="success" @click="create()" >
               <template #icon>
@@ -25,9 +25,6 @@
                   size="large"
                   ref="formRef"
                 >
-                  <n-form-item label="ឈ្មោះក្នុងប្រព័ន្ធ" path="username" class="w-4/5 mr-8" >
-                    <n-input v-model:value="record.username" placeholder="ឈ្មោះក្នុងប្រព័ន្ធ" />
-                  </n-form-item>
                   <n-form-item label="ត្រកូល" path="lastname" class="w-4/5 mr-8" >
                     <n-input v-model:value="record.lastname" placeholder="ត្រកូល" />
                   </n-form-item>
@@ -40,8 +37,8 @@
                   <n-form-item label="អ៊ីមែល" path="email" class="w-4/5 mr-8" >
                     <n-input v-model:value="record.email" placeholder="អ៊ីមែល" />
                   </n-form-item>
-                  <n-form-item label="ពាក្យសម្ងាត់" path="password" class="w-4/5 mr-8" >
-                    <n-input v-model:value="record.password" placeholder="ពាក្យសម្ងាត់" />
+                  <n-form-item label="អសយដ្ឋាន" path="address" class="w-4/5 mr-8" >
+                    <n-input v-model:value="record.address" placeholder="អសយដ្ឋាន" />
                   </n-form-item>
                 </n-form>
                 <div class="w-1/2 h-8"></div>  
@@ -76,28 +73,6 @@ export default {
         })
       },
       // validator: (val) => {}
-    } , 
-    record: {
-      type: Object ,
-      required: false ,
-      default: () => {
-        return reactive({
-          id: 0 ,
-          username: '' ,
-          firstname: '' ,
-          lastname: '' ,
-          email: '' ,
-          phone: '',
-          active: 1 ,
-          password: ''
-        })
-      },
-      // validator: (val) => {
-      //   for(var field in ['id','username','firstname','lastname','email','phone','password','active'] ){
-      //     if( !val.hasOwnProperty(field) ) return false
-      //   }
-      //   return true 
-      // }
     },
     show: {
       type: Boolean ,
@@ -113,6 +88,13 @@ export default {
   setup(props){
     var store = useStore()
     const message = useMessage()
+    var record = reactive({
+        lastname: '' ,
+        firstname: '' ,
+        phone: '' ,
+        email: '' ,
+        address: ''
+      })
     /**
      * Variables
      */    
@@ -126,32 +108,27 @@ export default {
           required: true,
           message: 'សូមបញ្ចូលត្រកូល',
           trigger: [ 'blur']
-        },
-        password: {
-          required: true,
-          message: 'សូមបញ្ចូលពាក្យសម្ងាត់',
-          trigger: [ 'blur']
         }
     }
     /**
      * Functions
      */
     function clearRecord(){
-      props.record = {
-        id : 0 ,
-        username: '' ,
-        lastname: '' ,
-        firstname: '' ,
-        phone: '' ,
-        email: '' ,
-        password: '' ,
-        active: 1
-      }
+      record.lastname = ''
+      record.firstname = ''
+      record.phone = '' 
+      record.email = '' 
+      record.address = ''
+    }
+
+    function closeForm(){
+      props.show = false 
+      props.onClose()
     }
 
     function create(){
-      if( props.record.phone == "" && props.record.email == "" ){
-        message.warning('សូមបំពេញ លេខទូរស័ព្ទ ឬ អ៊ីមែល')
+      if( record.firstname == "" || record.lastname == "" ){
+        message.warning('សូមបំពេញ ត្រកូល និង ឈ្មោះ')
         return false
       }
       if( props.model === undefined || props.model.name == "" ){
@@ -159,20 +136,17 @@ export default {
         return false
       }
       store.dispatch( props.model.name+'/create',{
-        id: props.record.id ,
-        username: props.record.username ,
-        firstname: props.record.firstname ,
-        lastname: props.record.lastname ,
-        phone: props.record.phone ,
-        email: props.record.email ,
-        password: props.record.password ,
-        active: props.record.active == 1 ? 1 : 0
+        firstname: record.firstname ,
+        lastname: record.lastname ,
+        phone: record.phone ,
+        email: record.email ,
+        address: record.address 
       }).then( res => {
         switch( res.status ){
           case 200 : 
           message.success( res.data.message )
           clearRecord()
-          props.onClose()
+          closeForm()
           break;
         }
       }).catch( err => {
@@ -186,6 +160,7 @@ export default {
        * Variables
        */
       rules ,
+      record ,
       /**
        * Functions
        */

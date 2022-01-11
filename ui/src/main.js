@@ -23,6 +23,8 @@ import store from './store'
 
 import router from './router.js'
 
+import HtmlToPaper from "./plugins/htmltopeper.js";
+
 
 let app = createApp(App)
 
@@ -47,4 +49,5 @@ app.use(router)
 app.use(Vant)
 app.use(VueToast)
 app.use(NaiveUI)
+app.use(HtmlToPaper)
 app.mount('#app')

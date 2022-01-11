@@ -1,4 +1,4 @@
-import product from '../../api/crud'
+import crud from '../../api/crud'
 
 // initial state
 const state = () => ({
@@ -19,20 +19,20 @@ const getters = {
 
 // actions
 const actions = {
-  async list ({ state, commit, rootState }) {
-    return await product.list(rootState.apiServer+"/package")
+  async list ({ state, commit, rootState },params) {
+    return await crud.list(rootState.apiServer+"/package",params)
   },
   async read ({ state, commit, rootState },params) {
-    return await product.read(rootState.apiServer+"/package/"+params.id)
+    return await crud.read(rootState.apiServer+"/package/"+params.id)
   },
   async create ({ state, commit, rootState },params) {
-    return await product.create(rootState.apiServer+"/package/create",params)
+    return await crud.create(rootState.apiServer+"/package/create",params)
   },
   async update ({ state, commit, rootState },params) {
-    return await product.update(rootState.apiServer+"/package/update",params)
+    return await crud.update(rootState.apiServer+"/package/update",params)
   },
   async delete ({ state, commit, rootState },params) {
-    return await product.delete(rootState.apiServer+"/package/"+params.id)
+    return await crud.delete(rootState.apiServer+"/package/"+params.id)
   }
 }
 

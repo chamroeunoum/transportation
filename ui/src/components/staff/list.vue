@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="true" >
   <!-- Top action panel of crud -->
     <div class="flex title-bar border-b border-gray-200">
       <!-- Title of crud -->
@@ -7,7 +7,7 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="mt-2 w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
-        <div class="leading-8 font-bold" v-html="model.title" ></div>
+        <div class="leading-8 font-bold" v-html="'ព័ត៌មាន ' + model.title" ></div>
       </div>
       <!-- Actions button of the crud -->
       <div class="flex-grow action-buttons flex-row-reverse flex">
@@ -23,12 +23,25 @@
           </n-button>
         </div>
         <div class="w-2/5 relative" >
-          <input type="text" @keypress.enter="filterRecords(false)" v-model="table.search" class="bg-gray-100 px-2 h-9 my-1 w-full rounded border border-gray-200 focus:border-blue-600 hover:border-blue-600 " placeholder="ស្វែងរក" />
-          <Icon size="27" class="absolute right-1 top-2 text-gray-400 hover:text-blue-700 cursor-pointer" @click="filterRecords(false)" >
+          <n-input 
+          type="text" 
+          @keyup.enter="filterRecords(false)" 
+          v-model:value="table.search" 
+          clearable
+          @clear="table.search='';filterRecords(false)"
+          class="bg-gray-100 px-2 h-9 my-1 w-full  " placeholder="ស្វែងរក" 
+          >
+            <template #prefix>
+              <n-icon>
+                <Search20Regular />
+              </n-icon>
+            </template>
+          </n-input>
+          <!-- <Icon size="27" class="absolute right-1 top-2 text-gray-400 hover:text-blue-700 cursor-pointer" >
             <n-icon>
               <Search20Regular />
             </n-icon>
-          </Icon>
+          </Icon> -->
         </div>
         
       </div>
@@ -39,35 +52,17 @@
     <div class="vcb-table-panel relative">
       <table class="vcb-table" >
         <tr class="vcb-table-headers" >
-          <th class="vcb-table-header" >ល.រ</th>
-          <th class="vcb-table-header" >ត្រកូល</th>
-          <th class="vcb-table-header">ឈ្មោះ</th>
-          <th class="vcb-table-header">ឈ្មោះក្នុងប្រព័ន្ធ</th>
-          <th class="vcb-table-header">លេខទូរស័ព្ទ</th>
-          <th class="vcb-table-header">អ៊ីមែល</th>
-          <th class="vcb-table-header text-right">ស្ថានភាពគណនី</th>
+          <th v-for="(column,index) in table.columns.format" :key="index" class="vcb-table-header" >{{ column.label }}</th>
           <th class="vcb-table-header text-right w-40" >ប្រតិបត្តិការ</th>
         </tr>
         <tr v-for="(record, index) in table.records.matched" :key='index' class="vcb-table-row" >
-          <td class="vcb-table-cell font-bold" >{{ index + 1 }}</td>
-          <td class="vcb-table-cell" >{{ record.lastname }}</td>
-          <td  class="vcb-table-cell" >{{ record.firstname }}</td>
-          <td  class="vcb-table-cell" >{{ record.username }}</td>
-          <td  class="vcb-table-cell" >{{ record.phone }}</td>
-          <td class="vcb-table-cell" >{{ record.email }}</td>
-          <td  class="vcb-table-cell text-right w-24" >
-            <n-icon size="30" :class="'cursor-pointer ' + (record.active == 1 ? ' text-green-500 ' : ' text-gray-500 ') " @click="activateAccount(record)" :title="record.active == 1 ? 'គណនីនេះកំពុងបើកតំណើរការ' : 'គណនីនេះកំពុងត្រូវបានបិទមិនអាចប្រើប្រាស់បាន' " >
-              <IosCheckmarkCircleOutline />
-            </n-icon>
-          </td>
+          <!-- <td class="vcb-table-cell font-bold" >{{ index + 1 }}</td> -->
+          <td v-for="(column,index) in table.columns.format" :key="index" class="vcb-table-cell" v-html="record[column.field]" ></td>
           <td class="vcb-table-actions-panel text-right w-40" >
             <n-icon size="30" class="cursor-pointer text-blue-500" @click="showEditModal(record)" title="កែប្រែព័ត៌មាន" >
               <Edit20Regular />
             </n-icon>
-            <n-icon size="30" class="cursor-pointer text-yellow-500" @click="inputPassword(record)" title="ប្ដូរពាក្យសម្ងាត់សម្រាប់គណនីនេះ" >
-              <Key16Regular />
-            </n-icon>
-            <n-icon size="30" class="cursor-pointer text-red-500" @click="deleteAccount(record)" title="លុបគណនីនេះចោល" >
+            <n-icon size="30" class="cursor-pointer text-red-500" @click="deleteRecord(record)" title="លុបចោល" >
               <TrashOutline />
             </n-icon>
           </td>
@@ -82,7 +77,7 @@
           កំពុងអាន...
         </div>
         <div class="absolute top-3 right-3 " @click="closeTableLoading" >
-          <Icon size="40" class="text-red-600" >
+          <Icon size="40" class="text-gray-400" >
            <CloseCircleOutline />
           </Icon>
         </div>
@@ -101,46 +96,6 @@
       <!-- Go to -->
       <!-- Total per page -->
     </div>
-    <!-- Form change password -->
-    <div class="vcb-pop-edit font-ktr">
-      <n-modal v-model:show="changePasswordModal.show" transform-origin="center">
-        <n-card class="w-1/2 font-pvh text-xl" title="ប្ដូរពាក្យសម្ងាត់" :bordered="false" size="small">
-          <template #header-extra>
-            <n-button type="success" @click="changePassword(changePasswordModal.form)" >
-              <template #icon>
-                <n-icon>
-                  <Save20Regular />
-                </n-icon>
-              </template>
-              រក្សារទុក
-            </n-button>
-          </template>
-          <!-- Form change password -->
-          <div class="crud-create-form w-full border-t">
-            <div class=" mx-auto p-4 flex-wrap">
-              <div class="crud-form-panel w-full flex flex-wrap ">
-                <n-form 
-                  class="w-full text-left font-btb text-lg flex flex-wrap" 
-                  :label-width="80"
-                  :model="changePasswordModal.form"
-                  :rules="changePasswordModal.rules"
-                  size="large"
-                  ref="formRef"
-                >
-                  <n-form-item label="ពាក្យសម្ងាត់ថ្មី" path="password" class="w-2/5 mr-8" >
-                    <n-input v-model:value="changePasswordModal.form.password" placeholder="ពាក្យសម្ងាត់ថ្មី" />
-                  </n-form-item>
-                </n-form>
-                <div class="w-1/2 h-8"></div>  
-              </div>
-            </div>
-          </div>
-          <!-- End form change password -->
-          <template #footer></template>
-        </n-card>
-      </n-modal>
-    </div>
-    <!-- End of change password -->
     <!-- Form create account -->
     <create-form v-bind:model="model" v-bind:show="createModal.show" :onClose="closeCreateModal"/>
     <!-- Form update account -->
@@ -148,7 +103,7 @@
   </div>
 </template>
 <script>
-import { reactive } from 'vue'
+import { reactive , ref } from 'vue'
 import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import QrcodeVue from 'qrcode.vue'
@@ -163,9 +118,39 @@ import { Edit20Regular, Key16Regular, Save20Regular, Add20Regular, Search20Regul
  * CRUD component form
  */
 import CreateForm from './create.vue'
-import UpdateForm from './update.vue'
+import UpdateForm from './edit.vue'
 export default {
-  name: "User" ,
+  props: {
+    model: {
+      type: Object ,
+      required: true
+    } , // Object model contain property 'name' which is the name of the model and 'title' which is the title of the component to show to the user
+    columns: {
+      type: Array ,
+      required: true 
+    } , // Object contains the properties that are the name of the columns
+    searchable: {
+      type: Array ,
+      required: true 
+    } , // Object contains the properties that are the name of the columns which searchable (text)
+    show: {
+      type: Boolean ,
+      default: false
+    } ,
+    perPage: {
+      type: Number ,
+      default: 5
+    } , // The identified number of the total records show per page
+    onShow: {
+      type: Function ,
+      default: () => {}
+    } ,  // Toggle the visibility (show) of the listing component
+    onClose: {
+      type: Function ,
+      default: () => {}
+    } , // Toggle the visibility (hide) of the listing component
+  },
+  name: "ListComponent" ,
   components: {
     QrcodeVue ,
     Vue3Barcode,
@@ -183,17 +168,13 @@ export default {
     Save20Regular ,
     TrashOutline
   },
-  setup(){
+  setup(props){
     var store = useStore()
     const dialog = useDialog()
     const message = useMessage()
     /**
      * Variables
      */    
-    var model = reactive( {
-      name: "user" ,
-      title: "គណនី"
-    })
     var table = reactive( {
       loading: false ,
       search: '' ,
@@ -202,43 +183,14 @@ export default {
         matched: []
       },
       columns: {
-        searchable: {
-          username: '' ,
-          firstname: '' ,
-          lastname: '' ,
-          email: '' ,
-          phone: '' ,
-          active: ''
-        },
-        format: {
-          username: '' ,
-          firstname: '' ,
-          lastname: '' ,
-          email: '' ,
-          phone: '' ,
-          active: ''
-        }
-      } ,
+        searchable: props.searchable,
+        format: props.columns
+      },
       pagination: {
-        perPage: 2 ,
+        perPage: props.perPage ,
         page: 1 ,
         totalPages: 0 ,
         totalRecords: 0
-      }
-    })
-
-    var changePasswordModal = reactive({
-      show: false ,
-      account: null ,
-      form: {
-        password: ''
-      },
-      rules: {
-        password: {
-          required: true,
-          message: 'សូមបញ្ចូលពាក្យសម្ងាត់ថ្មី',
-          trigger: [ 'blur']
-        },
       }
     })
 
@@ -268,26 +220,39 @@ export default {
      */
     function getRecords(){
       /**
-       * Clear time interval after calling
+       * Check the column searchable is defined 
+       * And the columns are defined
        */
-      window.clearTimeout()
-      table.loading = true
-      store.dispatch(model.name+'/list',{
-        search: {
-          fields: ['username','firstname','lastname','phone','email'] ,
-          value: table.search
-        },
-        pagination: {
-          perPage: table.pagination.perPage ,
-          page: table.pagination.page
-        }
-      }).then(res => {
-        table.records.all = table.records.matched = res.data.records
-        table.pagination = res.data.pagination
-        closeTableLoading()
-      }).catch( err => {
-        console.log( err )
-      })
+      if( Array.isArray( table.columns.format ) && 
+        Array.isArray( table.columns.searchable ) &&
+        table.columns.format.length > 0 && 
+        table.columns.searchable.length > 0
+      ){
+        /**
+         * Clear time interval after calling
+         */
+        window.clearTimeout()
+        table.loading = true
+        store.dispatch(props.model.name+'/list',{
+          columns: table.columns.format ,
+          search: {
+            fields: table.columns.searchable,
+            value: table.search
+          },
+          pagination: {
+            perPage: table.pagination.perPage ,
+            page: table.pagination.page
+          }
+        }).then(res => {
+          table.records.all = table.records.matched = res.data.records
+          table.pagination = res.data.pagination
+          closeTableLoading()
+        }).catch( err => {
+          console.log( err )
+        })
+      }else {
+        message.error('សូមបញ្ជាក់អំពីឈ្មោះក្បាលជួរឈរ នៃតារាង។')
+      }
     }
     function closeTableLoading(){
       table.loading = false
@@ -311,105 +276,14 @@ export default {
       getRecords()
     }
 
-    function activateAccount(record){
+    function deleteRecord(record){
       dialog.warning({
-        title: "បិទ ឬ បើក គណនី" ,
-        content: "តើអ្នកចង់ " + ( record.active == 1 ? "បិទ" : "បើក" )+ " គណនីនេះមែនទេ ?" ,
+        title: "លុបព័ត៌មាន" ,
+        content: "តើអ្នកចង់ លុប ព័ត៌មាននេះមែនទេ ?" ,
         positiveText: 'បាទ / ចាស',
         negativeText: 'ទេ',
         onPositiveClick: () => {
-          store.dispatch( model.name+'/update',{
-            id: record.id ,
-            active: record.active == 1 ? 0 : 1
-          }).then( res => {
-            switch( res.status ){
-              case 200 : 
-              message.success( res.data.message )
-              getRecords()
-              break;
-            }
-          }).catch( err => {
-            message.error( err )
-          })
-        },
-        onNegativeClick: () => {
-          
-        }
-      })
-    }
-    /**
-     * Create modal handling
-     */
-    var createModal = reactive({show:false})
-    function showCreateModal(){
-      createModal.show = true
-    }
-
-    function closeCreateModal(){
-      createModal.show = false
-      getRecords()
-    }
-
-    var editModal = reactive({show:false})
-    var editRecord = reactive({
-      id: 0 ,
-      username: "" ,
-      firstname: "" ,
-      lastname: "" ,
-      phone: "" ,
-      email: ""
-    })
-    function showEditModal(record){
-      editRecord.id = record.id
-      editRecord.username = record.username
-      editRecord.firstname = record.firstname
-      editRecord.lastname = record.lastname
-      editRecord.phone = record.phone
-      editRecord.email = record.email
-      editModal.show = true
-    }
-    function closeEditModal(record){
-      editModal.show = false
-      getRecords()
-    }
-
-    function inputPassword(record){
-      changePasswordModal.account = record
-      changePasswordModal.form = {
-        id: record.id ,
-        password: record.password
-      }
-      changePasswordModal.show = true
-    }
-    function changePassword(form){
-      store.dispatch( model.name+'/passwordChange',{
-            id: form.id ,
-            password: form.password 
-          }).then( res => {
-            switch( res.status ){
-              case 200 : 
-              message.success( res.data.message )
-              changePasswordModal.show = false
-              changePasswordModal.form = {
-                id : 0 ,
-                password: ''
-              }
-              getRecords()
-              break;
-            }
-          }).catch( err => {
-            message.error( err )
-          })
-    }
-
-    function deleteAccount(record){
-      dialog.warning({
-        title: "លុបគណនី" ,
-        content: "តើអ្នកចង់ លុប គណនីនេះមែនទេ ?" ,
-        positiveText: 'បាទ / ចាស',
-        negativeText: 'ទេ',
-        onPositiveClick: () => {
-          store.dispatch(model.name+'/delete',{id:record.id}).then( res => {
+          store.dispatch(props.model.name+'/delete',{id:record.id}).then( res => {
           switch( res.status ){
             case 200 :
               message.success(res.data.message)
@@ -426,18 +300,77 @@ export default {
     }
 
     /**
+     * Create modal handling
+     */
+    var createModal = reactive({show:false})
+    function showCreateModal(){
+      createModal.show = true
+    }
+
+    function closeCreateModal(){
+      createModal.show = false
+      getRecords()
+    }
+
+    var editModal = reactive({show:false})
+    var editRecord = reactive({
+      id: 0 ,
+      firstname: '' ,
+      lastname: '' ,
+      phone: '' ,
+      email: '' ,
+      address: ''
+    })
+    function showEditModal(record){
+      /**
+       * Clone the object record to editRecord
+       */
+      editRecord.id = record.id 
+      editRecord.firstname = record.firstname 
+      editRecord.lastname = record.lastname 
+      editRecord.phone = record.phone 
+      editRecord.email = record.email 
+      editRecord.salary = record.salary 
+      editRecord.address = record.address 
+      editModal.show = true
+    }
+    function closeEditModal(record){
+      editModal.show = false
+      getRecords()
+    }
+
+    /**
+     * Clear record
+     */
+    function clearRecord() {
+      // table.columns.format.reduce((o, key) => Object.assign(o, {[key]: '' }), {})
+    }
+
+    /**
+     * Toggle showing list
+     */
+    var listShow = ref(props.show ? true : false)
+    function toggle(){
+      listShow.value = !listShow.value
+      listShow.value ? props.onShow() : props.onClose()
+    }
+
+    /**
      * Initial the data
      */
     getRecords()
+    listShow.value ? props.onShow() : props.onClose()
 
+    console.log( listShow.value )
 
     return {
       /**
        * Variables
        */
-      model ,
       table ,
-      changePasswordModal ,
+      toggle ,
+      listShow ,
+      clearRecord ,
       /**
        * Table
        */
@@ -466,13 +399,7 @@ export default {
       showEditModal ,
       closeEditModal , 
       editRecord ,
-      /**
-       * Functions
-       */
-      activateAccount ,
-      inputPassword ,
-      changePassword ,
-      deleteAccount
+      deleteRecord
     }
   }
 }

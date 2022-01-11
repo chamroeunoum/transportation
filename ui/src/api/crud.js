@@ -3,7 +3,7 @@ import { getAuthorization } from "../plugins/authentication"
 export default {
   async list(url,params){
     return await axios({
-      method: 'get' ,
+      method: 'put' ,
       url: url ,
       data: params ,
       headers: {

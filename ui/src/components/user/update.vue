@@ -1,20 +1,179 @@
 <template>
-  <div class="crud-update-form">Crud Update Form
-
-    <router-link to="/package" class="mx-2 w-8 h-8 text-center hover:border-blue-300 duration-300 cursor-pointer" >
-          <van-icon name="add-o" size="30" />
-          <!-- <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto w-4 h-4 mt-2 duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-          </svg> -->
-        </router-link>
-  </div>
+  <!-- Form edit account -->
+    <div class="vcb-pop-create font-ktr">
+      <n-modal v-model:show="show" :on-after-leave="onClose" transform-origin="center">
+        <n-card class="w-1/2 font-pvh text-xl" :title="'កែប្រែ ' + model.title" :bordered="false" size="small">
+          <template #header-extra>
+            <n-button type="success" @click="update()" >
+              <template #icon>
+                <n-icon>
+                  <Save20Regular />
+                </n-icon>
+              </template>
+              រក្សារទុក
+            </n-button>
+          </template>
+          <!-- Form edit account -->
+          <div class="crud-create-form w-full border-t">
+            <div class=" mx-auto p-4 flex-wrap">
+              <div class="crud-form-panel w-full flex flex-wrap ">
+                <n-form 
+                  class="w-full text-left font-btb text-lg flex flex-wrap" 
+                  :label-width="80"
+                  :model="record"
+                  :rules="rules"
+                  size="large"
+                  ref="formRef"
+                >
+                  <n-form-item label="ឈ្មោះក្នុងប្រព័ន្ធ" path="username" class="w-4/5 mr-8" >
+                    <n-input v-model:value="record.username" placeholder="ឈ្មោះក្នុងប្រព័ន្ធ" />
+                  </n-form-item>
+                  <n-form-item label="ត្រកូល" path="lastname" class="w-4/5 mr-8" >
+                    <n-input v-model:value="record.lastname" placeholder="ត្រកូល" />
+                  </n-form-item>
+                  <n-form-item label="ឈ្មោះ" path="firstname" class="w-4/5 mr-8" >
+                    <n-input v-model:value="record.firstname" placeholder="ឈ្មោះ" />
+                  </n-form-item>
+                  <n-form-item label="ទូរស័ព្ទ" path="phone" class="w-4/5 mr-8" >
+                    <n-input v-model:value="record.phone" placeholder="ទូរស័ព្ទ" />
+                  </n-form-item>
+                  <n-form-item label="អ៊ីមែល" path="email" class="w-4/5 mr-8" >
+                    <n-input v-model:value="record.email" placeholder="អ៊ីមែល" />
+                  </n-form-item>
+                </n-form>
+                <div class="w-1/2 h-8"></div>  
+              </div>
+            </div>
+          </div>
+          <!-- End form edit account -->
+          <template #footer></template>
+        </n-card>
+      </n-modal>
+    </div>
+    <!-- End of edit account -->
 </template>
 <script>
+import { reactive } from 'vue'
+import { useStore } from 'vuex'
+import { useMessage } from 'naive-ui'
+import { Save20Regular } from '@vicons/fluent'
 
 export default {
-  setup(){
+  components: {
+    Save20Regular
+  },
+  props: {
+    model: {
+      type: Object ,
+      required: true ,
+      default: () => {
+        return reactive({
+          name: 'Undefined' ,
+          title: 'No title'
+        })
+      },
+      // validator: (val) => {}
+    } , 
+    record: {
+      type: Object ,
+      required: true ,
+      default: () => {
+        return reactive({
+          id: 0 ,
+          username: '' ,
+          firstname: '' ,
+          lastname: '' ,
+          email: '' ,
+          phone: ''
+        })
+      },
+      // validator: (val) => {
+      //   for(var field in ['id','username','firstname','lastname','email','phone','password','active'] ){
+      //     if( !val.hasOwnProperty(field) ) return false
+      //   }
+      //   return true 
+      // }
+    },
+    show: {
+      type: Boolean ,
+      default: false
+    },
+    onClose: {
+      type: Function
+    } ,
+    // onShow: {
+    //   type: Function
+    // }
+  },
+  setup(props){
+    var store = useStore()
+    const message = useMessage()
+    /**
+     * Variables
+     */    
+    var rules = {
+        firstname: {
+          required: true,
+          message: 'សូមបញ្ចូលឈ្មោះ',
+          trigger: [ 'blur']
+        },
+        lastname: {
+          required: true,
+          message: 'សូមបញ្ចូលត្រកូល',
+          trigger: [ 'blur']
+        }
+    }
+    /**
+     * Functions
+     */
+    function clearRecord(){
+      props.record.id = 0
+      props.record.username = ""
+      props.record.firstname = ""
+      props.record.lastname = ""
+      props.record.phone = ""
+      props.record.email = ""
+    }
+
+    function update(){
+      if( props.record.phone == "" && props.record.email == "" ){
+        message.warning('សូមបំពេញ លេខទូរស័ព្ទ ឬ អ៊ីមែល')
+        return false
+      }
+      if( props.model === undefined || props.model.name == "" ){
+        message.warning("ទម្រង់នៃព័ត៌មានមិនទាន់បានកំណត់។")
+        return false
+      }
+      store.dispatch( props.model.name+'/update',{
+        id: props.record.id ,
+        username: props.record.username ,
+        firstname: props.record.firstname ,
+        lastname: props.record.lastname ,
+        phone: props.record.phone ,
+        email: props.record.email
+      }).then( res => {
+        switch( res.status ){
+          case 200 : 
+          message.success( res.data.message )
+          clearRecord()
+          props.onClose()
+          break;
+        }
+      }).catch( err => {
+        message.error( err )
+      })
+    }
+  
+
     return {
-      
+      /**
+       * Variables
+       */
+      rules ,
+      /**
+       * Functions
+       */
+      update 
     }
   }
 }

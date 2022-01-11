@@ -4,16 +4,17 @@
 </script>
 
 <template>
-<n-dialog-provider>
-<n-message-provider>
-  <router-view v-slot="{ Component, route }">
-    <!-- Use any custom transition and fallback to `fade` -->
-    <transition :name="route.meta.transition || 'fade'">
-      <component :is="Component" />
-    </transition>
-  </router-view>
-</n-message-provider>
-</n-dialog-provider>
+  <n-dialog-provider>
+  <n-message-provider>
+    <router-view v-slot="{ Component, route }">
+      <!-- Use any custom transition and fallback to `fade` -->
+      <transition :name="route.meta.transition || 'fade'">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+    <div id="receiptPrintArea"></div>
+  </n-message-provider>
+  </n-dialog-provider>
 </template>
 <script>
 export default {

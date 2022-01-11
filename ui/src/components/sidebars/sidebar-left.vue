@@ -13,7 +13,7 @@
         <!-- Label -->
         <router-link to="/user" class="flex-grow leading-10 text-left label " >
           <div class="text-md">អ្នកប្រើប្រាស់</div>
-        </router-link>  
+        </router-link>
       </div>
       <!-- Menu Item -->
       <div class="flex w-full h-12 p-1 bg-gray-100 border-b">

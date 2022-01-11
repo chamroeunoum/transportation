@@ -6,11 +6,11 @@
         <div @click="toggleCreatePopup(true)" class="mx-2 w-8 h-8 mt-1 text-center hover:border-blue-300 duration-300 cursor-pointer" >
           <van-icon name="add-o" :size="32" class="hover:text-blue-600 " />
         </div>
-        <div @click="$router.push('/package')" class="mx-2 ml-4 my-1 w-8 h-8 text-center hover:border-blue-300 duration-300 cursor-pointer" >
+        <!-- <div @click="$router.push('/package')" class="mx-2 ml-4 my-1 w-8 h-8 text-center hover:border-blue-300 duration-300 cursor-pointer" >
           <Icon :size="30">
             <Table />
           </Icon>
-        </div>
+        </div> -->
         <div class="w-1/2" >
           <input type="text" @keyup="filterProducts" v-model="search.value" class="bg-gray-100 px-2 h-8 my-1 w-full rounded border border-gray-200 focus:border-blue-600 hover:border-blue-600 " placeholder="ស្វែងរកឥវ៉ាន់តាមលេខកូដ" />
         </div>
@@ -34,11 +34,11 @@
     <van-divider class="w-full text-2xl font-pvh" >កញ្ចប់ឥវ៉ាន់</van-divider>
     <div v-for="(record, index) in this.products.matched" :key="index" class="font-ktr w-1/6 relative flex flex-wrap text-left border border-gray-300 bg-gray-50 m-4 p-4 shadow hover:shadow-xl" >
       <div class="w-full text-xl mt-4 mb-2 font-dangrek text-blue-500" >{{ record.code }}</div>
-      <div class="w-1/2 font-extrabold my-1" >
+      <!-- <div class="w-full font-extrabold my-1" >
         <van-icon name="location-o" color="#1989fa"/>
         {{ record.from }}
-      </div>
-      <div class="w-1/2 font-extrabold my-1" >
+      </div> -->
+      <div class="w-full font-extrabold my-1" >
         <van-icon name="location" color="#1989fa"/>
         {{ record.to }}
       </div>
@@ -51,35 +51,47 @@
         {{ record.receiver_phone }}
       </div>
       <div class="w-1/2 font-extrabold my-1" >
+        ចំនួនកញ្ចប់ ៖ {{ record.total_packages }}
+      </div>
+      <!-- <div class="w-1/2 font-extrabold my-1" >
         <van-icon name="bag-o" color="#1989fa"/>
         {{ record.weight }} គីឡូ
       </div>
       <div class="w-1/2 font-extrabold my-1" >
         <van-icon name="send-gift-o" color="#1989fa"/>
         {{ record.dimension }}
-      </div>
+      </div> -->
       <div :class="'w-full font-extrabold my-1 ' + ( record.payment_status == 1 ? 'text-green-600 ' : 'text-red-600 ' ) " >
         <van-icon name="paid" />
         {{ record.price }} ฿ - {{ record.payment_status == 1 ? "បង់រួច" : "មិនទាន់បង់" }}
       </div>
-      <div class="w-full font-extrabold mt-1 mb-1 border-t py-4 " >
-        <!-- <van-icon name="records" color="#1989fa"/> -->
+      <div class="w-full font-extrabold mt-1 mb-1 py-2 " >
         {{ record.note }}
       </div>
-      <!-- <div v-if="record.client!==undefined" title="ឈ្មោះភ្ញៀវ" class="w-1/2 font-extrabold my-1 mx-auto" >
-        <van-icon name="records" color="#1989fa"/>
-        {{ record.client.lastname + ' ' + record.client.firstname }}
-      </div> -->
-      <div class="w-1/2 font-extrabold my-1 mx-auto" >
-        <qrcode-vue :value="record.code" :size="60" level="H" class="mx-auto" />
+      <div v-if="record.client!==undefined" title="ឈ្មោះភ្ញៀវ" class="w-1/2 font-extrabold mt-2 mx-auto" >
+        <div class="h-16 w-full leading-10 flex flex-wrap">
+          <Icon size="30" class="text-blue-500 " >
+            <MdMan />
+          </Icon>
+          <div class="h-8 ">{{ ( record.client.lastname !== null ? record.client.lastname + " " : "" ) + ( record.client.firstname !== null ? record.client.firstname : "" ) }}</div>
+        </div>
+      </div>
+      <div class="w-1/2 font-extrabold mt-2 mx-auto" >
+        <qrcode-vue :value="record.to+','+record.code+','+record.sender_phone+','+record.receiver_phone" :size="60" level="H" class="mx-auto" />
       </div>
       
       <div class="mx-2 w-4 h-4 mt-1 text-center text-red-500 cursor-pointer absolute top-1 right-1" >
         <van-icon name="close" :size="20" class="" @click="remove(record)" />
       </div>
-      <div class="mx-2 w-4 h-4 mt-1 text-center text-blue-500 cursor-pointer absolute top-1 right-7" >
+      <div class="mx-2 w-4 h-4 mt-1 text-center text-blue-500 cursor-pointer absolute top-1 right-8" >
         <van-icon name="edit" :size="20" class="" @click="edit(record)" />
       </div>
+      <div class="mx-2 w-4 h-4 mt-1 text-center text-yellow-500 cursor-pointer absolute top-1 right-16" >
+        <icon size="20" class="" @click="showPrintReceipt(record)" >
+          <Print24Regular />
+        </icon>
+      </div>
+      
       <!-- <div class="mx-2 w-4 h-4 mt-1 text-center text-blue-500 cursor-pointer absolute top-1 right-12" >
         <van-icon name="orders-o" @click="print(record)" />
       </div> -->
@@ -122,6 +134,7 @@
                   <n-form-item label="អតិថិជន" class="w-2/5 mr-8" >
                     <n-select
                       v-model:value="product.create.client_id"
+                      on-update:value="updateClientForCreation"
                       filterable
                       clearable
                       placeholder="សូមជ្រើសរើសអតិថិជន" 
@@ -139,6 +152,9 @@
                   </n-form-item>
                   <n-form-item label="តម្លៃផ្ញើ (បាត)" path="price" class="w-2/5 mr-8" >
                     <n-input v-model:value="product.create.price" placeholder="តម្លៃផ្ញើ" />
+                  </n-form-item>
+                  <n-form-item label="ចំនួនកញ្ចប់" path="total_packages" class="w-2/5 mr-8" >
+                    <n-input-number type="number" :step="1" :min="1" v-model:value="product.create.total_packages" placeholder="ចំនួនកញ្ចប់" />
                   </n-form-item>
                   <n-form-item label="ទំងន់ (គីឡូ)"  class="w-2/5 mr-8" >
                     <n-input v-model:value="product.create.weight" placeholder="ទំងន់" />
@@ -240,6 +256,9 @@
                   <n-form-item label="តម្លៃផ្ញើ (បាត)" path="price" class="w-2/5 mr-8" >
                     <n-input v-model:value="product.edit.price" placeholder="តម្លៃផ្ញើ" />
                   </n-form-item>
+                  <n-form-item label="ចំនួនកញ្ចប់" path="total_packages" class="w-2/5 mr-8" >
+                    <n-input-number type="number" :step="1" :min="1" v-model:value="product.edit.total_packages" placeholder="ចំនួនកញ្ចប់" />
+                  </n-form-item>
                   <n-form-item label="ទំងន់ (គីឡូ)"  class="w-2/5 mr-8" >
                     <n-input v-model:value="product.edit.weight" placeholder="ទំងន់" />
                   </n-form-item>
@@ -289,18 +308,96 @@
         </n-card>
       </n-modal>
     </div>
+    <!-- <teleport to="#receiptPrintArea" > -->
+      <div v-if="printing.show" class="printing-dialog absolute left-0 top-0 right-0 bottom-0 bg-white ">
+        <div v-if="printing.record!==null" id="receiptPrintArea" class="font-ktr relative flex flex-wrap text-left  m-4 p-4 mx-auto mt-5" style="width: 302.36px; " >
+          <div class="w-full font-extrabold my-1 text-center" >
+            <img src="./../../assets/logo.png" class=" rounded-full w-20 mx-auto" alt="SCT Logo" title="SCT Logo" />
+            Sony Cambodia Transportation Co,. Ltd.
+            <br/>(+66) 83 2222 496 / (+66) 88 8857 941
+            <br/>120 433 Soi Phetchaburi 15, Thanon Phaya Thai, Ratchathewi, Bangkok 10400
+          </div>
+          <div class="w-full text-xl mt-4 mb-2 font-dangrek text-center" >{{ printing.record.code }}</div>
+          <div class="w-full font-extrabold my-1" >
+            <van-icon name="location-o" color="#1989fa"/>
+            ចេញពី&emsp;៖ {{ printing.record.from }}
+          </div>
+          <div class="w-full font-extrabold my-1" >
+            <van-icon name="location" color="#1989fa"/>
+            គោលដៅ&nbsp;៖ {{ printing.record.to }}
+          </div>
+          <div class="w-1/2 font-extrabold my-1" >
+            <van-icon name="phone-o" color="#1989fa"/>
+            ទូរស័ព្ទអ្នកផ្ញើ ៖
+          </div>
+          <div class="w-1/2 font-extrabold my-1" >
+            <van-icon name="phone" color="#1989fa"/>
+            ទូរស័ព្ទអ្នកទទួល ៖
+          </div>
+          <div class="w-1/2 font-extrabold my-1" >
+            {{ printing.record.sender_phone }}
+          </div>
+          <div class="w-1/2 font-extrabold my-1" >
+            {{ printing.record.receiver_phone }}
+          </div>
+          <div class="w-full font-extrabold my-1" >
+            ចំនួនកញ្ចប់ ៖ {{ printing.record.total_packages }}
+          </div>
+          <!-- <div class="w-1/2 font-extrabold my-1" >
+            <van-icon name="bag-o" color="#1989fa"/>
+            {{ printing.record.weight }} គីឡូ
+          </div> -->
+          <!-- <div class="w-1/2 font-extrabold my-1" >
+            <van-icon name="send-gift-o" color="#1989fa"/>
+            {{ printing.record.dimension }}
+          </div> -->
+          <div :class="'w-full font-extrabold my-1 ' + ( printing.record.payment_status == 1 ? 'text-green-600 ' : 'text-red-600 ' ) " >
+            <van-icon name="paid" />
+            {{ printing.record.price }} ฿ - {{ printing.record.payment_status == 1 ? "បង់រួច" : "មិនទាន់បង់" }}
+          </div>
+          <div class="w-full font-extrabold mt-1 mb-1 py-2 " >
+            {{ printing.record.note }}
+          </div>
+          <!-- <div v-if="printing.record.client!==undefined" title="ឈ្មោះភ្ញៀវ" class="w-1/2 font-extrabold mt-2 mx-auto" >
+            <div class="h-16 w-full leading-10 flex flex-wrap">
+              <Icon size="30" class="text-blue-500 " >
+                <MdMan />
+              </Icon>
+              <div class="h-8 ">{{ ( printing.record.client.lastname !== null ? printing.record.client.lastname + " " : "" ) + ( printing.record.client.firstname !== null ? printing.record.client.firstname : "" ) }}</div>
+            </div>
+          </div> -->
+          <div class="w-1/2 font-extrabold mt-2 mx-auto" >
+            <qrcode-vue :value="printing.record.to+','+printing.record.code+','+printing.record.sender_phone+','+printing.record.receiver_phone" :size="60" level="H" class="mx-auto" />
+          </div>
+        </div>
+        <!-- printing actions -->
+        <div id="buttonPrintReceipt" class="buttonPrintReceipt mx-2 w-4 h-4 mt-1 text-center text-green-500 cursor-pointer absolute top-2 right-24" @click="printReceipt()" >
+          <icon size="40" class="" @click="showPrintReceipt(record)" >
+            <Print24Regular />
+          </icon>
+        </div>
+        <div id="buttonClosePrinting" class="buttonClosePrinting mx-2 w-4 h-4 mt-1 text-center text-red-500 cursor-pointer absolute top-2 right-7" @click="closePrintReceipt()">
+          <van-icon name="close" :size="40" class=""  />
+        </div>
+        <!-- <div class="mx-2 w-4 h-4 mt-1 text-center text-yellow-500 cursor-pointer absolute top-1 right-16" >
+          <icon size="20" class="" @click="showPrintReceipt(printing.record)" >
+            <Print24Regular />
+          </icon>
+        </div> -->
+      </div>
+    <!-- </teleport> -->
   </div>
 </template>
 
 <script>
 import QrcodeVue from 'qrcode.vue'
 import { Notify, Dialog } from 'vant'
-import { Table } from '@vicons/carbon'
+import { Table, Save } from '@vicons/carbon'
 import { Icon } from '@vicons/utils'
+import { MdMan } from '@vicons/ionicons4'
 import { ref, reactive, computed } from 'vue'
-import { Save } from "@vicons/carbon"
 import { ArrowBackIosNewRound } from '@vicons/material'
-import { Box16Regular } from '@vicons/fluent'
+import { Box16Regular, Print24Regular } from '@vicons/fluent'
 
 export default {
   setup () {
@@ -341,12 +438,14 @@ export default {
     }
   },
   components: {
+    MdMan ,
     QrcodeVue,
     Table,
     Icon,
     Save, 
     ArrowBackIosNewRound,
-    Box16Regular
+    Box16Regular,
+    Print24Regular
   },
   data(){
     return {
@@ -373,7 +472,8 @@ export default {
           dimension: '60x40x20' ,
           price: '' ,
           note: '',
-          payment_status: 1
+          payment_status: 1 ,
+          total_packages: 1
         },
         edit: {
           id: 0 ,
@@ -387,22 +487,9 @@ export default {
           dimension: '60x40x20' ,
           price: '' ,
           note: '',
-          payment_status: 1
+          payment_status: 1 ,
+          total_packages: 1
         }
-      },
-      clearRecord: {
-        id: 0 ,
-        client_id: null ,
-        code: '' ,
-        from: 'បាងកក' ,
-        to: '' ,
-        sender_phone: '' ,
-        receiver_phone: '' ,
-        weight: '' ,
-        dimension: '60x40x20' ,
-        price: '' ,
-        note: '',
-        payment_status: 1
       },
       savingLoading: false ,
       editLoading: false ,
@@ -412,6 +499,10 @@ export default {
       client: {
         records: [] ,
         client_id: ''
+      },
+      printing: {
+        record: null ,
+        show: false
       }
     }
   },
@@ -465,17 +556,31 @@ export default {
     this.$store.dispatch('client/list').then( res => {
       switch( res.status ){
         case 200:
-          this.client.records = res.data.records.records
+          this.client.records = res.data.records
         default: 
           break;
       }
-      console.log( this.client.records )
     }).catch( err => console.log( err ) )
   },
   mounted(){
     
   },
   methods: {
+    updateClientForCreation(){
+      console.log( 'me' )
+    },
+    printReceipt(record){
+      // this.$htmlToPaper("receipt");
+      window.print();
+    },
+    showPrintReceipt(record){
+      this.printing.record = record
+      this.printing.show = true
+    },
+    closePrintReceipt(){
+      this.printing.show = false
+      this.printing.record = null
+    },
     remove(record){
       Dialog.confirm({
         title: "លុបព័ត៌មានបញ្ញើ" ,
@@ -527,7 +632,8 @@ export default {
         dimension: record.dimension ,
         price: record.price + '',
         note: record.note,
-        payment_status: record.payment_status
+        payment_status: record.payment_status ,
+        total_packages: record.total_packages > 0 ? record.total_packages : 1
       }
       this.toggleEditPopup(true)
     },
@@ -542,7 +648,21 @@ export default {
       // return false
       this.product.edit.client_id = this.product.edit.client_id > 0 ? this.product.edit.client_id : 0
       this.editLoading = true 
-      this.$store.dispatch('product/update', this.product.edit ).then( res => {
+      this.$store.dispatch('product/update', {
+        id: this.product.edit.id ,
+        client_id: this.product.edit.client_id > 0 ? this.product.edit.client_id : 0 ,
+        code: this.product.edit.code ,
+        from: this.product.edit.from ,
+        to: this.product.edit.to ,
+        sender_phone: this.product.edit.sender_phone ,
+        receiver_phone: this.product.edit.receiver_phone ,
+        weight: this.product.edit.weight <= 0 ? 0 : this.product.edit.weight ,
+        dimension: this.product.edit.dimension ,
+        price: this.product.edit.price <= 0 ? 0 : this.product.edit.price ,
+        note: this.product.edit.note,
+        payment_status: this.product.edit.payment_status == 1 ? 1 : 0 ,
+        total_packages: this.product.edit.total_packages > 0 ? this.product.edit.total_packages : 1
+      }).then( res => {
         switch( res.status ){
           case 200 : 
             this.getRecords()
@@ -551,7 +671,7 @@ export default {
 
             break;
         }
-        this.product.edit = this.clearRecord
+        this.product.edit = this.clearRecord()
         this.toggleEditPopup(false)
         this.editLoading = false 
       }).catch( err => {
@@ -569,6 +689,23 @@ export default {
       
       if( this.products.matched.length <= 0 ) {
         this.products.matched = this.products.all
+      }
+    },
+    clearRecord(){
+      return {   
+        id: 0 ,
+        client_id: null ,
+        code: '' ,
+        from: 'បាងកក' ,
+        to: '' ,
+        sender_phone: '' ,
+        receiver_phone: '' ,
+        weight: '' ,
+        dimension: '60x40x20' ,
+        price: '' ,
+        note: '',
+        payment_status: 1 ,
+        total_packages: 1
       }
     },
     validateData(record){
@@ -628,7 +765,20 @@ export default {
       }
       
       this.savingLoading = true 
-      this.$store.dispatch('product/create', this.product.create ).then( res => {
+      this.$store.dispatch('product/create', {
+          client_id: this.product.create.client_id > 0 ? this.product.create.client_id : 0 ,
+          code: this.product.create.code ,
+          from: this.product.create.from ,
+          to: this.product.create.to ,
+          sender_phone: this.product.create.sender_phone ,
+          receiver_phone: this.product.create.receiver_phone ,
+          weight: this.product.create.weight <= 0 ? 0 : this.product.create.weight ,
+          dimension: this.product.create.dimension ,
+          price: this.product.create.price <= 0 ? 0 : this.product.create.price ,
+          note: this.product.create.note,
+          payment_status: this.product.create.payment_status == 1 ? 1 : 0 ,
+          total_packages: this.product.create.total_packages > 0 ? this.product.create.total_packages : 1
+        }).then( res => {
         switch( res.status ){
           case 200 : 
             this.getRecords()
@@ -637,7 +787,7 @@ export default {
 
             break;
         }
-        this.product.create = this.clearRecord
+        this.product.create = this.clearRecord()
         this.toggleCreatePopup(false)
         this.savingLoading = false 
       }).catch( err => {
@@ -654,7 +804,12 @@ export default {
      * Get records
      */
     getRecords(){
-      this.$store.dispatch('product/list').then(res => {
+      this.$store.dispatch('product/list',{
+        pagination: {
+          perPage: 100 ,
+          page: 1
+        }
+      }).then(res => {
         this.$store.commit('product/setRecords',res.data.records)
         this.products.all = this.products.matched = this.$store.getters['product/getRecords'].records
       }).catch( err => {
@@ -665,3 +820,19 @@ export default {
   
 }
 </script>
+
+<style >
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+    #receiptPrintArea, #receiptPrintArea * {
+      visibility: visible;
+    }
+    #receiptPrintArea {
+      /* position: absolute;
+      left: 0;
+      top: 0; */
+    }
+  }
+</style>
