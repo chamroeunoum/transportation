@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Branch;
 
 class Package extends Model
 {
     use HasFactory, SoftDeletes;
     protected $guarded = ['id'];
-    protected $fillable = ['note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','payment_status', 'receiver_phone','price','code', 'from','to','created_at','updated_at','created_by','updated_by','total_packages'];
+    protected $fillable = ['note','branch_id','weight','dimension','sender_id','receiver_id','client_id','sender_phone','payment_status', 'receiver_phone','price','code', 'from','to','created_at','updated_at','created_by','updated_by','total_packages'];
+    protected $casts = [
+        'dimension' => 'array'
+    ];
 
     /**
      * Relationships
@@ -34,6 +38,15 @@ class Package extends Model
         return $this->belongsTo(\App\Models\User::class,'deleted_by','id');
     }
     /**
+     * Get the branch that owns the Staff
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id','id');
+    }
+    /**
      * Functions
      */
     /**
@@ -54,6 +67,7 @@ class Package extends Model
     /**
      * Count total package's income by year
      */
+    
     public static function boot()
     {
         parent::boot();

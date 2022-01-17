@@ -25,6 +25,9 @@ const actions = {
   async read ({ state, commit, rootState },params) {
     return await crud.read(rootState.apiServer+"/package/"+params.id)
   },
+  async readUnauth ({ state, commit, rootState },params) {
+    return await crud.readUnauth(rootState.apiServer+"/package/"+params.id+'/public')
+  },
   async create ({ state, commit, rootState },params) {
     return await crud.create(rootState.apiServer+"/package/create",params)
   },

@@ -89,6 +89,12 @@ class AuthController extends Controller
          * Get authenticated user
          */
         $user = $request->user(); 
+        /**
+         * Fetching the detail information of the account and the branch that it is in
+         */
+        if( $user->staff && $user->staff->branch_id > 0 ){
+            $user->staff->branch;
+        }
 
         /**
          * Create token for authenticated user
@@ -111,6 +117,9 @@ class AuthController extends Controller
                 $user->avatar_url = null ;
             }
         }
+
+        // Load the detail information of the account (user)
+        $user->staff;
 
         return response()->json([
             'token' => [

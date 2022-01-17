@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Staff;
 
 class User extends Authenticatable
 {
@@ -42,6 +43,7 @@ class User extends Authenticatable
         "created_at" ,
         "updated_at" ,
         "deleted_at" ,
+        'role'
     ];
 
     /**
@@ -62,4 +64,14 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Get the staff that owns the User
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class, 'member_id');
+    }
 }

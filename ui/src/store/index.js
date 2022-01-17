@@ -9,9 +9,10 @@ const debug = process.env.NODE_ENV !== 'production'
 
 export default createStore({
   state: {
-    apiServer: 'http://sctservice.kabit.asia/api'
+    // apiServer: 'http://sctservice.kabit.asia/api'
     // apiServer: 'http://127.0.0.1:8000/api'
-    // apiServer: 'http://192.168.1.40:8000/api'
+    apiServer: 'http://192.168.1.40:8000/api' ,
+    branch: ''
   },
   modules: {
     product ,

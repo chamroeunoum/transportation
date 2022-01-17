@@ -5,7 +5,7 @@
             <!-- Apps -->
             <div v-if="toggleApps" class="fixed top-0 bottom-0 left-0 right-0 z-40 flex flex-wrap content-start w-full px-4 py-24 bg-gray-800 sm:px-4 md:px-4 lg:p-24 xl:p-24 bg-opacity-95">
                 <!-- Search -->
-                <div class='absolute top-0 left-0 right-0 flex flex-wrap content-center w-2/5 py-4 m-auto md:w-2/5 xl:w-1/5 lg:w-1/5' >
+                <!-- <div class='absolute top-0 left-0 right-0 flex flex-wrap content-center w-2/5 py-4 m-auto md:w-2/5 xl:w-1/5 lg:w-1/5' >
                     <n-input 
                       suffix="ios-search" 
                       placeholder="ស្វែងរក ..." 
@@ -20,7 +20,7 @@
                       </template>
                     </n-input>
 
-                </div>
+                </div> -->
                 <!-- End search -->
                 <!-- Apps -->
                 <div class="flex flex-wrap content-center apps">
@@ -40,9 +40,14 @@
         <!-- Apps launcher -->
         <div class='fixed -bottom-14 h-12 left-0 right-0 z-50 flex flex-wrap justify-center w-full py-4' >
             <!-- Apps icon -->
-            <div @click="toggleApps = !toggleApps" class="w-12 h-12 p-2 -mt-20 mx-2 text-center bg-white border border-black rounded-full shadow cursor-pointer " >
-                <n-icon class='text-gray-700 ' size="30" >
+            <div @click="toggleApps = !toggleApps" class="w-12 h-12 p-2 -mt-20 mx-2 text-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer " >
+                <n-icon class='text-blue-700 ' size="30" >
                   <Apps />
+                </n-icon>
+            </div>
+            <div @click="logout()" class="w-12 h-12 p-2 -mt-20 mx-2 text-center bg-white rounded-full shadow-md border border-gray-300 cursor-pointer " >
+                <n-icon class='text-red-700 ' size="30" >
+                  <Power20Regular />
                 </n-icon>
             </div>
         </div>
@@ -62,9 +67,13 @@ import { reactive, ref , computed } from 'vue'
 import { IosSearch } from '@vicons/ionicons4'
 import { SupervisedUserCircleOutlined , SupervisedUserCircleSharp } from "@vicons/material"
 import { Apps, SpeedometerOutline } from '@vicons/ionicons5'
+import { isAuth, authLogout , isAdmin , getUser } from './../../plugins/authentication'
 import { Receipt2 } from '@vicons/tabler'
-import { Receipt20Regular } from '@vicons/fluent'
+import { Receipt20Regular , Power20Regular} from '@vicons/fluent'
 import { UserMultiple } from '@vicons/carbon'
+import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
+import { useDialog , useMessage } from 'naive-ui'
 export default {  
   components: {
     IosSearch,
@@ -74,7 +83,8 @@ export default {
     UserMultiple ,
     Receipt20Regular ,
     Receipt2 ,
-    SpeedometerOutline
+    SpeedometerOutline ,
+    Power20Regular
   } ,
   name: 'dock' ,
   props: [
@@ -82,68 +92,99 @@ export default {
   ],
   setup(){
     let search = ref(null)
-    let matchedApps = computed( () => 
-      search.value != '' || search.value != null ? apps :
-        ( search.value.trim() != '' ?
-          apps.value.filter( app => app.name.indexOf( search.value ) != -1 ) :
-          apps
-        )
+    let matchedApps = computed( () => {
+        let matched = ref([])
+        if( search.value != '' && search.value != null && search.value.trim() != '' ){
+          matched.value = apps.value.filter( app => app.name.indexOf( search.value ) != -1 && app.roles.includes( parseInt(getUser().role )) )
+        }else{
+          matched.value = apps.value.filter( app => app.roles.includes( parseInt(getUser().role) ) )
+        }
+        console.log( "Role : " + getUser().role )
+        console.log( matched.value.length )
+        return matched
+        // search.value != '' || search.value != null ? apps :
+        // ( search.value.trim() != '' ?
+        //   apps.value.filter( app => app.name.indexOf( search.value ) != -1 ) :
+        //   apps
+        // )
+      }
     )
     let apps = ref([
       {
           url: '/dashboard' ,
           icon: 'SpeedometerOutline' ,
           name: 'ផ្ទាំងព័ត៌មាន',
-          // roles: [
-          //     1, // Admin
-          //     2, // Super
-          //     3, // Auditor
-          //     4, // Member
-          //     5 // Customer
-          // ]
+          roles: [
+              1, // Admin
+              // 2, // Super
+              // 3, // Auditor
+              // 4, // Member
+              // 5 // Customer
+          ]
       },
       {
           url: '/user' ,
           icon: 'SupervisedUserCircleOutlined' ,
           name: 'គណនី',
-          // roles: [
-          //     1, // Admin
-          //     2, // Super
-          //     3, // Auditor
-          //     4, // Member
-          //     5 // Customer
-          // ]
+          roles: [
+              1, // Admin
+              // 2, // Super
+              // 3, // Auditor
+              // 4, // Member
+              // 5 // Customer
+          ]
       },
       {
           url: '/client' ,
           icon: 'UserMultiple' ,
-          name: 'អតិថិជន'
+          name: 'អតិថិជន' ,
+          roles: [
+              1, // Admin
+              2, // Super
+              // 3, // Auditor
+              // 4, // Member
+              // 5 // Customer
+          ]
       },
       {
           url: '/receive' ,
           icon: 'Receipt20Regular' ,
-          name: 'បញ្ញើ'
+          name: 'បញ្ញើ',
+          roles: [
+              // 1, // Admin
+              2, // Super
+              // 3, // Auditor
+              // 4, // Member
+              // 5 // Customer
+          ]
       },
       {
           url: '/staff' ,
           icon: 'SupervisedUserCircleSharp' ,
-          name: 'បុគ្គលិក'
+          name: 'បុគ្គលិក' ,
+          roles: [
+              1, // Admin
+              // 2, // Super
+              // 3, // Auditor
+              // 4, // Member
+              // 5 // Customer
+          ]
       },
-      {
-          url: '/incomeoutcome' ,
-          icon: 'Receipt2' ,
-          name: 'ចំណូលចំណាយ'
-      }
+      // {
+      //     url: '/incomeoutcome' ,
+      //     icon: 'Receipt2' ,
+      //     name: 'ចំណូលចំណាយ'
+      // }
     ])
     /** End app metadata */
     let toggleApps = ref(false)
     let user = reactive({})
 
     function filterApps(){
-      if( search.value != '' && search.value != null ){
-        matchedApps = search.value.trim() != '' ?
-          // this.apps.filter( app => app.name.toLowerCase().indexOf( this.search.toLowerCase() ) != -1 ) :
-          apps.value.filter( app => app.name.indexOf( search.value ) != -1 ) : apps
+      if( search.value != '' && search.value != null && search.value.trim() != '' ){
+        matchedApps = apps.value.filter( app => app.name.indexOf( search.value ) != -1 && app.roles.includes( parseInt(getUser().role) ) )
+      }else{
+        matchedApps = apps.value.filter( app => app.roles.includes( parseInt(getUser().role) ) )
       }
     }
     function toggleAppFunc(){
@@ -153,7 +194,48 @@ export default {
         console.log( "confirm before logout" )
     }
 
+    const dialog = useDialog();
+    const message = useMessage();
+    const store = useStore();
+    const router = useRouter()
+    async function logout(){
+      const d = dialog.warning({
+        title: 'ចាកចេញ',
+        content: 'តើអ្នកចង់ចាកចេញមែនទេ?',
+        positiveText: 'បាទ / ចាស',
+        negativeText: 'ទេ',
+        onPositiveClick: () => {
+          /**
+           * Check whether the user has logged out already
+           */
+          if( isAuth() ) {
+            /**
+             * Show confirm dialog
+             */
+            d.loading = true
+            store.dispatch('auth/logout').then( res => {
+              authLogout()
+              message.success(res.data.message)
+              d.loading = false
+              router.push('/login')
+            }).catch( err => {
+              console.log( err )
+            })
+          }else{
+            router.push('/login')
+          }
+        },
+        // onNegativeClick: () => {
+        //   message.error('Not Sure')
+        // }
+      })
+    }
+    function isAdminAccount(){
+      return isAdmin()
+    }
+
     return {
+      logout ,
       search ,
       matchedApps ,
       apps ,
@@ -161,7 +243,8 @@ export default {
       user ,
       filterApps ,
       toggleAppFunc ,
-      logoutConfirmation
+      logoutConfirmation ,
+      isAdminAccount
     }
   },
   mounted() {

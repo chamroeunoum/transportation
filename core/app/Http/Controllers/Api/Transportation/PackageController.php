@@ -13,7 +13,7 @@ class PackageController extends Controller
      * Listing packages
      */
     public function index(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id'  , "branch_id" ,'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         $crud->setRelationshipFunctions([
             'client' => [
                 'firstname', 'lastname' , 'phone', 'address', 'email', 'photo'
@@ -23,7 +23,15 @@ class PackageController extends Controller
             ]
         ]);
         $queryBuilder = $crud->getListBuilder()
-        ->where('created_at','LIKE',\Carbon\Carbon::now()->format("Y-m-d%"));
+        /**
+         * List only the packages that entry today
+         */
+        ->where('created_at','LIKE',\Carbon\Carbon::now()->format("Y-m-d%"))
+        /**
+         * List only the package owned by the authenticated user
+         */
+        ->where('created_by', $request->user()->id )
+        ;
         return response()->json([
             'records' => $crud->pagination(true,$queryBuilder) ,
             'message' => 'Listing ready.'
@@ -33,7 +41,7 @@ class PackageController extends Controller
      * Read package
      */
     public function read(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' ,"branch_id" ,'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         if( ($record = $crud->read() ) ){
             return response()->json([
                 'record' => $record ,
@@ -50,7 +58,7 @@ class PackageController extends Controller
      */
     public function create(Request $request){
         $request->merge(['code'=> "SCTN".\Carbon\Carbon::now()->format('YmdHis') ]);
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' ,"branch_id" ,'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         if( ( $record = $crud->create() ) ){
             return response()->json([
                 'record' => $record ,
@@ -66,7 +74,7 @@ class PackageController extends Controller
      * Update package
      */
     public function update(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' ,"branch_id" ,'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         if( ( $record = $crud->update() ) ){
             return response()->json([
                 'record' => $record,
@@ -82,7 +90,7 @@ class PackageController extends Controller
      * Delete package
      */
     public function delete(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' ,"branch_id" ,'total_packages' , "payment_status", 'note','weight','dimension','sender_id','receiver_id','client_id','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         if( ($record = $crud->read() ) ){
             if( $crud->delete() ){
                 return response()->json([
@@ -104,7 +112,7 @@ class PackageController extends Controller
      * Compact list
      */
     public function compact(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'weight','total_packages' ,'payment_status', 'dimension','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'branch_id', 'weight','total_packages' ,'payment_status', 'dimension','sender_phone','receiver_phone','price','code', 'from','to', 'created_at','updated_at','created_by','updated_by','deleted_by' ]);
         return response()->json([
             'records' => $crud->getRecords() ,
             'message' => 'Compact listing ready.'

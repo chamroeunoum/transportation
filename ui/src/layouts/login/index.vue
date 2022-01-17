@@ -34,7 +34,7 @@ import { Notify } from 'vant'
         />
       </van-cell-group>
       <div class="w-full mt-4">
-        <van-button type="primary" size="small" @click="login" :loading="btnLoginLoading" loading-text="Signing in..." class="px-8" >ចូល</van-button>
+        <van-button type="primary" size="small" @click="login" :loading="btnLoginLoading" loading-text="កំពុងពិនិត្យ..." class="px-8" >ចូល</van-button>
       </div>
       <div class="mt-16">
         <FooterComponent />
@@ -90,11 +90,16 @@ export default {
               user: res.data.user ,
               token: res.data.token ,
             })
+            
             Notify({
               type: 'success' ,
               message: "សួស្ដី, " + res.data.user.lastname + " " +  res.data.user.firstname
             })
-            this.$router.push('/receive')
+            if( res.data.user.role == 1 ){
+              this.$router.push('/dashboard')
+            }else{
+              this.$router.push('/receive')
+            }
           break;
           default:
             Notify({

@@ -13,7 +13,7 @@ class UserController extends Controller
      * Listing packages
      */
     public function index(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'role' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
         $responseMessage = $crud->pagination(true,$crud->getListBuilder() ) ;
         $responseMessage['message'] = 'អានព័ត៌មានរួចរាល់';
         return response()->json( $responseMessage ,200);
@@ -22,7 +22,7 @@ class UserController extends Controller
      * Read package
      */
     public function read(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'role' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
         if( ($record = $crud->read() ) ){
             return response()->json([
                 'record' => $record ,
@@ -55,7 +55,7 @@ class UserController extends Controller
      * Create package
      */
     public function create(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username', 'password','firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'role' ,'email','username', 'password','firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
         if( ( $record = $crud->create() ) ){
             $record->password = bcrypt( $request->password );
             $record->active = 1 ;
@@ -74,7 +74,7 @@ class UserController extends Controller
      * Update package
      */
     public function update(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'role' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
         if( ( $record = $crud->update() ) ){
             return response()->json([
                 'record' => $record,
@@ -90,7 +90,7 @@ class UserController extends Controller
      * Delete package
      */
     public function delete(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'role' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
         if( ($record = $crud->read() ) ){
             if( $crud->delete() ){
                 return response()->json([
@@ -112,7 +112,7 @@ class UserController extends Controller
      * Compact list
      */
     public function compact(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id' , 'role' ,'email','username' ,'firstname' ,'lastname' ,'phone' ,'avatar_url' ,"member_id" ,"active" ,"created_at" ,"updated_at" ,"deleted_at"]);
         return response()->json([
             'records' => $crud->getRecords() ,
             'message' => 'អានព័ត៌មានរួចរាល់'

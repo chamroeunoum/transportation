@@ -12,7 +12,7 @@ class StaffController extends Controller
      * Listing packages
      */
     public function index(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname"  , "branch_id" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
         $responseMessage = $crud->pagination(true,$crud->getListBuilder() ) ;
         $responseMessage['message'] = 'អានព័ត៌មានរួចរាល់';
         return response()->json( $responseMessage ,200);
@@ -21,7 +21,7 @@ class StaffController extends Controller
      * Read package
      */
     public function read(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname"  , "branch_id" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
         if( ($record = $crud->read() ) ){
             return response()->json([
                 'record' => $record ,
@@ -56,7 +56,7 @@ class StaffController extends Controller
      * Update package
      */
     public function update(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname"  , "branch_id" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
         if( ( $record = $crud->update() ) ){
             return response()->json([
                 'record' => $record,
@@ -72,7 +72,7 @@ class StaffController extends Controller
      * Delete package
      */
     public function delete(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname"  , "branch_id" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
         if( ($record = $crud->read() ) ){
             if( $crud->delete() ){
                 return response()->json([
@@ -94,7 +94,7 @@ class StaffController extends Controller
      * Compact list
      */
     public function compact(Request $request){
-        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
+        $crud = new CrudController( new RecordModel, $request , [ 'id', "firstname"  , "branch_id" , "lastname" , "phone" , "address" , "email" , "photo" , "salary" , "created_at" , "updated_at"  ]);
         return response()->json([
             'records' => $crud->getRecords() ,
             'message' => 'អានរួចរាល់'

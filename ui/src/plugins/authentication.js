@@ -65,3 +65,10 @@ export const getUser = () => {
 export const setUser = (user) => {
   localStorage.setItem('user',JSON.stringify(user));
 }
+export const isAdmin = () => {
+  let admin = getUser()
+  if( isAuth() && admin !== null && admin.role == 1 ){
+    return true 
+  }
+  return false
+}

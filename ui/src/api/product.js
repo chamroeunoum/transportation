@@ -1,10 +1,10 @@
 import axios from "axios"
 
 export default {
-  async list(api){
+  async list(api,params){
     return await axios.get(api)
   },
-  async read(){
+  async read(api,params){
     return await axios.get(api)
   },
   async create(){

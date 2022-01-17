@@ -21,7 +21,7 @@ export default {
       }
     })
   },
-  async read(url){
+  async read(url,params){
     return await axios({
       method: 'get' ,
       url: url ,
@@ -31,7 +31,13 @@ export default {
       }
     })
   },
-  
+  async readUnauth(url,params){
+    return await axios({
+      method: 'get' ,
+      url: url ,
+      data: params
+    })
+  },
   async create(url,params){
     return await axios({
       method: 'post' ,
